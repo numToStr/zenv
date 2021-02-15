@@ -1,7 +1,3 @@
-use std::collections::HashMap;
-
-type KeyHash = HashMap<String, String>;
-
 const QUOTE: char = '\'';
 const D_QUOTE: char = '"';
 
@@ -27,20 +23,6 @@ pub fn parse_line<'a>(line: &'a str) -> Option<(&'a str, &'a str)> {
         }
         _ => None,
     }
-}
-
-pub fn parse_multi_line<'a>(lines: &'a Vec<String>) -> KeyHash {
-    let mut hash: KeyHash = HashMap::with_capacity(lines.len());
-
-    for line in lines {
-        let p = parse_line(&line);
-
-        if let Some((key, val)) = p {
-            hash.entry(key.into()).or_insert(val.into());
-        }
-    }
-
-    hash
 }
 
 #[cfg(test)]
@@ -105,18 +87,5 @@ mod tests {
     fn parse_line_empty_test() {
         let empty = parse_line("");
         assert_eq!(empty, None);
-    }
-
-    #[test]
-    fn parse_multi_line_test() {
-        let vars = parse_multi_line(&vec![
-            "NODE_ENV=production".into(),
-            "".into(),
-            "WHAT=".into(),
-            "# COMMENTED=this will be hidden".into(),
-            "SOMETHING=That I don' know".into(),
-        ]);
-
-        assert_eq!(vars.len(), 3);
     }
 }
