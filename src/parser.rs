@@ -1,7 +1,8 @@
 const QUOTE: char = '\'';
 const D_QUOTE: char = '"';
+const N_LINE: &'static str = "\\n";
 
-pub fn parse_line<'a>(line: &'a str) -> Option<(&'a str, &'a str)> {
+pub fn parse_line<'a>(line: &'a str) -> Option<(String, String)> {
     if line.is_empty() || line.starts_with('#') {
         return None;
     }
@@ -10,16 +11,19 @@ pub fn parse_line<'a>(line: &'a str) -> Option<(&'a str, &'a str)> {
 
     match (parts.next(), parts.next()) {
         (Some(k), Some(v)) => {
-            return match (
-                v.starts_with(QUOTE),
-                v.ends_with(QUOTE),
-                v.starts_with(D_QUOTE),
-                v.ends_with(D_QUOTE),
-            ) {
-                (true, true, false, false) => Some((k, v.trim_matches(QUOTE))),
-                (false, false, true, true) => Some((k, v.trim_matches(D_QUOTE))),
-                _ => Some((k, v.trim())),
-            };
+            let key = k.trim().to_string();
+
+            let first = v.chars().next();
+            let last = v.chars().next_back();
+
+            match (first, last, v.contains(N_LINE)) {
+                (Some(D_QUOTE), Some(D_QUOTE), true) => {
+                    Some((key, v.trim_matches(D_QUOTE).replace(N_LINE, "\n")))
+                }
+                (Some(D_QUOTE), Some(D_QUOTE), _) => Some((key, v.trim_matches(D_QUOTE).into())),
+                (Some(QUOTE), Some(QUOTE), _) => Some((key, v.trim_matches(QUOTE).into())),
+                _ => Some((key, v.trim().to_string())),
+            }
         }
         _ => None,
     }
@@ -87,5 +91,19 @@ mod tests {
     fn parse_line_empty_test() {
         let empty = parse_line("");
         assert_eq!(empty, None);
+    }
+
+    #[test]
+    fn parse_line_newline_char_test() {
+        let (key, val) = parse_line(r#"WHAT="You\nAre\nAwesome""#).unwrap();
+        assert_eq!(key, "WHAT");
+        assert_eq!(val, "You\nAre\nAwesome");
+    }
+
+    #[test]
+    fn parse_line_no_newline_char_test() {
+        let (key, val) = parse_line(r#"WHAT='You\nAre\nAwesome'"#).unwrap();
+        assert_eq!(key, "WHAT");
+        assert_eq!(val, "You\\nAre\\nAwesome");
     }
 }
