@@ -7,7 +7,6 @@ use std::{
 };
 
 type KeyHash = HashMap<String, String>;
-type VarsBuf = Lines<BufReader<File>>;
 
 // Just re-exporting to use as a standalone parser
 pub use parser::parse_line;
@@ -22,14 +21,15 @@ impl Denv {
         Denv { path }
     }
 
-    pub fn read(&self) -> Result<VarsBuf> {
+    pub fn read(&self) -> Result<Lines<BufReader<File>>> {
         let file = File::open(&self.path)?;
         let reader = BufReader::new(file);
 
         Ok(reader.lines())
     }
 
-    pub fn parse(&self, lines: VarsBuf) -> KeyHash {
+    pub fn parse(&self) -> Result<KeyHash> {
+        let lines = self.read()?;
         let mut hash: KeyHash = HashMap::with_capacity(lines.size_hint().0);
 
         for line in lines {
@@ -41,12 +41,11 @@ impl Denv {
             }
         }
 
-        hash
+        Ok(hash)
     }
 
     pub fn config(&self) -> Result<()> {
-        let lines = self.read()?;
-        let vars = self.parse(lines);
+        let vars = self.parse()?;
 
         for (key, val) in vars {
             std::env::set_var(key, val);
