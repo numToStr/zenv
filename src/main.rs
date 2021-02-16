@@ -1,9 +1,11 @@
+mod cli;
+use std::process::exit;
 use std::process::{Command, Stdio};
-use std::{ffi::OsString, path::PathBuf, process::exit};
 
+use cli::Cli;
 use denv::Denv;
 
-const HELP: &str = "\
+const HELP: &'static str = "\
 denv - Dotenv (.env) loader written in rust
 
 USAGE:
@@ -25,96 +27,32 @@ Examples:
     denv -f .env -- terraform apply
 ";
 
-#[derive(Debug)]
-struct Args {
-    help: bool,
-    path: Option<PathBuf>,
-    bin_args: Vec<OsString>,
-}
-
-fn parse_args() -> Result<Args, pico_args::Error> {
-    // `from_vec` takes `OsString`, not `String`.
-    let mut args: Vec<_> = std::env::args_os().collect();
-    args.remove(0); // remove the executable path.
-
-    // Find and process `--`.
-    let bin_args = if let Some(dash_dash) = args.iter().position(|arg| arg == "--") {
-        // Store all arguments following ...
-        let later_args = args.drain(dash_dash + 1..).collect();
-        // .. then remove the `--`
-        args.pop();
-        later_args
-    } else {
-        Vec::with_capacity(0)
-    };
-
-    // Now pass the remaining arguments through to `pico_args`.
-    let mut args = pico_args::Arguments::from_vec(args);
-    let res = Args {
-        help: args.contains(["-h", "--help"]),
-        path: args.opt_value_from_str(["-f", "--file"])?,
-        bin_args,
-    };
-
-    // It's up to the caller what to do with the remaining arguments.
-    let remaining = args.finish();
-    if !remaining.is_empty() {
-        eprintln!("Unknown arguments: {:?}", remaining);
-        exit(1)
-    }
-
-    Ok(res)
-}
-
 fn main() {
-    let args = match parse_args() {
-        Ok(args) => args,
-        Err(err) => {
-            eprintln!("{}", err);
-            exit(1)
-        }
-    };
+    let args = assert_result!(Cli::parse());
 
     if args.help {
         print!("{}", HELP);
         exit(0)
     }
 
-    let fpath = match args.path {
-        Some(path) => path,
-        _ => {
-            eprintln!("-f/--file option is required");
-            exit(1)
-        }
-    };
+    let fpath = assert_arg!(args.path, "-f/--file option is required");
 
-    let mut a = args.bin_args.into_iter();
+    let binary = assert_arg!(args.binary, "<binary> name is required");
 
-    let code = match a.next() {
-        Some(binary) => {
-            let denv = Denv::new(fpath);
-            let vars = denv.parse().expect("Unable to parse variables");
+    let vars = assert_result!(Denv::new(fpath).parse());
 
-            let exit_status = Command::new(&binary)
-                .args(a)
-                .stdin(Stdio::inherit())
-                .stdout(Stdio::inherit())
-                .stderr(Stdio::inherit())
-                .envs(vars)
-                .spawn()
-                .expect(&format!(
-                    "Unable to spawn program: {}",
-                    binary.to_str().unwrap()
-                ))
-                .wait()
-                .expect("Failed to grab exit code");
+    let mut program = assert_result!(Command::new(&binary)
+        .args(args.bin_args)
+        .stdin(Stdio::inherit())
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
+        .envs(vars)
+        .spawn()
+        .map_err(|_| format!("Unable to spawn program - `{}`", binary.to_str().unwrap())));
 
-            exit_status.code().unwrap_or(1)
-        }
-        _ => {
-            eprintln!("<bin> is required");
-            1
-        }
+    let code = {
+        let exit_status = assert_result!(program.wait().map_err(|_| "Failed to grab exit code"));
+        exit_status.code().unwrap_or(1)
     };
 
     exit(code)
