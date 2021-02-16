@@ -1,0 +1,15 @@
+[alias]
+b = 'build --release'
+ii = "install --features=cli --path ."
+run_win = "run --features=cli --target=x86_64-pc-windows-gnu"
+build_win = "build --features=cli --target=x86_64-pc-windows-gnu --release"
+build_linux = "build --features=cli --target=x86_64-unknown-linux-gnu --release"
+
+[target.'cfg(unix)']
+rustflags = ["-C", "link-arg=-s"]
+
+[target.x86_64-pc-windows-msvc]
+rustflags = ["-C", "target-feature=+crt-static"]
+
+[target.i686-pc-windows-msvc]
+rustflags = ["-C", "target-feature=+crt-static"]

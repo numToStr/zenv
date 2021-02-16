@@ -16,12 +16,17 @@ pub fn parse_line<'a>(line: &'a str) -> Option<(String, String)> {
             let first = v.chars().next();
             let last = v.chars().next_back();
 
-            match (first, last, v.contains(N_LINE)) {
-                (Some(D_QUOTE), Some(D_QUOTE), true) => {
-                    Some((key, v.trim_matches(D_QUOTE).replace(N_LINE, "\n")))
+            match (first, last) {
+                (Some(D_QUOTE), Some(D_QUOTE)) => {
+                    let val = if v.contains(N_LINE) {
+                        v.trim_matches(D_QUOTE).replace(N_LINE, "\n")
+                    } else {
+                        v.trim_matches(D_QUOTE).to_string()
+                    };
+
+                    Some((key, val))
                 }
-                (Some(D_QUOTE), Some(D_QUOTE), _) => Some((key, v.trim_matches(D_QUOTE).into())),
-                (Some(QUOTE), Some(QUOTE), _) => Some((key, v.trim_matches(QUOTE).into())),
+                (Some(QUOTE), Some(QUOTE)) => Some((key, v.trim_matches(QUOTE).into())),
                 _ => Some((key, v.trim().to_string())),
             }
         }
