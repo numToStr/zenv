@@ -6,6 +6,9 @@ pub struct Cli {
     // Print help information
     pub help: bool,
 
+    // Whether to substitute variables or not
+    pub expand: bool,
+
     // Path to .env file
     pub path: Option<PathBuf>,
 
@@ -38,6 +41,7 @@ impl Cli {
         let mut bin_args = bin_args.into_iter();
         let res = Cli {
             help: args.contains(["-h", "--help"]),
+            expand: args.contains(["-x", "--expand"]),
             path: args.opt_value_from_str(["-f", "--file"])?,
             binary: bin_args.next(),
             bin_args: bin_args.collect(),

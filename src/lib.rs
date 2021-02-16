@@ -1,4 +1,5 @@
 mod parser;
+mod substitution;
 use std::{
     collections::HashMap,
     fs::File,
@@ -10,15 +11,17 @@ type KeyHash = HashMap<String, String>;
 
 // Just re-exporting to use as a standalone parser
 pub use parser::parse_line;
+pub use substitution::Substitution;
 
 #[derive(Debug)]
 pub struct Denv {
     path: PathBuf,
+    expand: bool,
 }
 
 impl Denv {
-    pub fn new(path: PathBuf) -> Denv {
-        Denv { path }
+    pub fn new(path: PathBuf, expand: bool) -> Denv {
+        Denv { path, expand }
     }
 
     pub fn read(&self) -> Result<Lines<BufReader<File>>> {
@@ -37,8 +40,12 @@ impl Denv {
             let p = parse_line(&line);
 
             if let Some((key, val)) = p {
-                hash.entry(key.into()).or_insert(val.into());
+                hash.insert(key, val);
             }
+        }
+
+        if self.expand {
+            Substitution::new(&mut hash).substitute();
         }
 
         Ok(hash)

@@ -13,6 +13,7 @@ USAGE:
 
 FLAGS:
   -h, --help            Prints help information
+  -x, --expand          Enable variable expansion
 
 OPTIONS:
   -f, --file            Path to .env file
@@ -39,7 +40,7 @@ fn main() {
 
     let binary = assert_arg!(args.binary, "<binary> name is required");
 
-    let vars = assert_result!(Denv::new(fpath).parse());
+    let vars = assert_result!(Denv::new(fpath, args.expand).parse());
 
     let mut program = assert_result!(Command::new(&binary)
         .args(args.bin_args)
