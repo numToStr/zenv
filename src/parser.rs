@@ -7,7 +7,8 @@ impl<'a> LineParser {
     fn replacer(line: &'a str, builder: &mut String, to: &'a str) {
         let (again, rhs) = match line.find("\\n") {
             Some(pos) => {
-                let is_escaped = &line[(pos - 1)..pos];
+                // New line can be at the start of the string
+                let is_escaped = if pos > 0 { &line[(pos - 1)..pos] } else { "" };
 
                 match is_escaped {
                     "\\" => {
