@@ -10,7 +10,7 @@ use std::{
 type KeyHash = HashMap<String, String>;
 
 // Just re-exporting to use as a standalone parser
-pub use parser::parse_line;
+pub use parser::LineParser;
 pub use substitution::Substitution;
 
 #[derive(Debug)]
@@ -37,7 +37,7 @@ impl Denv {
 
         for line in lines {
             let line = line.expect("Unable to parse line");
-            let p = parse_line(&line);
+            let p = LineParser::parse_line(&line);
 
             if let Some((key, val)) = p {
                 hash.insert(key, val);
