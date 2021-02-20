@@ -8,16 +8,22 @@ impl<'a> LineParser {
         let (again, rhs) = match line.find("\\n") {
             Some(pos) => {
                 // New line can be at the start of the string
-                let is_escaped = if pos > 0 { &line[(pos - 1)..pos] } else { "" };
+                let is_escaped = match pos.checked_sub(1) {
+                    Some(idx) => match line.chars().nth(idx) {
+                        Some('\\') => true,
+                        _ => false,
+                    },
+                    _ => false,
+                };
 
                 match is_escaped {
-                    "\\" => {
-                        let lhs = &line[0..(pos + 2)];
-                        builder.push_str(lhs);
+                    true => {
+                        let lhs: String = line.chars().take(pos + 2).collect();
+                        builder.push_str(&lhs);
                     }
                     _ => {
-                        let lhs = &line[0..(pos)];
-                        builder.push_str(lhs);
+                        let lhs: String = line.chars().take(pos).collect();
+                        builder.push_str(&lhs);
                         builder.push_str(to);
                     }
                 };

@@ -42,6 +42,10 @@ fn main() {
 
     let vars = assert_result!(Denv::new(fpath, args.expand).parse());
 
+    // for (key, val) in &vars {
+    //     println!("{} {}", key, val);
+    // }
+
     let mut program = assert_result!(Command::new(&binary)
         .args(args.bin_args)
         .stdin(Stdio::inherit())
