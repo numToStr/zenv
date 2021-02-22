@@ -1,11 +1,12 @@
 const QUOTE: char = '\'';
 const D_QUOTE: char = '"';
+const N_LINE: &'static str = "\\n";
 
 pub struct LineParser;
 
 impl<'a> LineParser {
-    fn replacer(line: &'a str, builder: &mut String, to: &'a str) {
-        let (again, rhs) = match line.find("\\n") {
+    fn replacer(line: &'a str, builder: &mut String, to: char) {
+        let (again, rhs) = match line.find(N_LINE) {
             Some(pos) => {
                 // New line can be at the start of the string
                 let is_escaped = match pos.checked_sub(1) {
@@ -16,19 +17,16 @@ impl<'a> LineParser {
                     _ => false,
                 };
 
-                match is_escaped {
-                    true => {
-                        let lhs: String = line.chars().take(pos + 2).collect();
-                        builder.push_str(&lhs);
-                    }
-                    _ => {
-                        let lhs: String = line.chars().take(pos).collect();
-                        builder.push_str(&lhs);
-                        builder.push_str(to);
-                    }
-                };
+                if is_escaped {
+                    let lhs = &line[0..(pos + N_LINE.len())];
+                    builder.push_str(lhs);
+                } else {
+                    let lhs = &line[0..(pos)];
+                    builder.push_str(lhs);
+                    builder.push(to);
+                }
 
-                let rhs = &line[(pos + 2)..];
+                let rhs = &line[(pos + N_LINE.len())..];
 
                 (true, rhs)
             }
@@ -36,16 +34,16 @@ impl<'a> LineParser {
         };
 
         if again {
-            Self::replacer(&rhs, builder, to)
+            Self::replacer(rhs, builder, to)
         } else {
-            builder.push_str(&rhs)
+            builder.push_str(rhs)
         }
     }
 
     pub fn replace_new_line(line: &'a str) -> String {
         let mut builder = String::with_capacity(line.len());
 
-        Self::replacer(line, &mut builder, "\n");
+        Self::replacer(line, &mut builder, '\n');
 
         builder
     }
