@@ -5,7 +5,7 @@ use std::process::{Command, Stdio};
 use cli::Cli;
 use zenv::Zenv;
 
-const HELP: &'static str = "\
+const HELP: &str = "\
 zenv - Dotenv (.env) loader written in rust
 
 USAGE:

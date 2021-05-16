@@ -1,54 +1,61 @@
+use std::collections::HashMap;
+
 const QUOTE: char = '\'';
 const D_QUOTE: char = '"';
-const N_LINE: &str = "\\n";
+const ESC_NLINE: &str = "\\n";
+const NLINE: char = '\n';
 
-pub struct LineParser;
+fn replacer(line: &str, builder: &mut String, to: char) {
+    let (again, rhs) = match line.find(ESC_NLINE) {
+        Some(pos) => {
+            // New line can be at the start of the string
+            let is_escaped = match pos.checked_sub(1) {
+                Some(idx) => matches!(line.chars().nth(idx), Some('\\')),
+                _ => false,
+            };
 
-impl<'a> LineParser {
-    fn replacer(line: &'a str, builder: &mut String, to: char) {
-        let (again, rhs) = match line.find(N_LINE) {
-            Some(pos) => {
-                // New line can be at the start of the string
-                let is_escaped = match pos.checked_sub(1) {
-                    Some(idx) => matches!(line.chars().nth(idx), Some('\\')),
-                    _ => false,
-                };
-
-                if is_escaped {
-                    let lhs = &line[0..(pos + N_LINE.len())];
-                    builder.push_str(lhs);
-                } else {
-                    let lhs = &line[0..(pos)];
-                    builder.push_str(lhs);
-                    builder.push(to);
-                }
-
-                let rhs = &line[(pos + N_LINE.len())..];
-
-                (true, rhs)
+            if is_escaped {
+                let lhs = &line[0..(pos + ESC_NLINE.len())];
+                builder.push_str(lhs);
+            } else {
+                let lhs = &line[0..(pos)];
+                builder.push_str(lhs);
+                builder.push(to);
             }
-            _ => (false, line),
-        };
 
-        if again {
-            Self::replacer(rhs, builder, to)
-        } else {
-            builder.push_str(rhs)
+            let rhs = &line[(pos + ESC_NLINE.len())..];
+
+            (true, rhs)
         }
+        _ => (false, line),
+    };
+
+    if again {
+        replacer(rhs, builder, to)
+    } else {
+        builder.push_str(rhs)
     }
+}
 
-    pub fn replace_new_line(line: &'a str) -> String {
-        let mut builder = String::with_capacity(line.len());
+pub fn replace_new_line(line: &str) -> String {
+    let mut builder = String::with_capacity(line.len());
 
-        Self::replacer(line, &mut builder, '\n');
+    replacer(line, &mut builder, NLINE);
 
-        builder
-    }
+    builder
+}
 
-    pub fn parse_line(line: &'a str) -> Option<(String, String)> {
+#[derive(Debug)]
+pub enum Line {
+    KeyVal(String, String),
+    Empty,
+}
+
+impl From<&str> for Line {
+    fn from(line: &str) -> Self {
         if line.is_empty() || line.starts_with('#') {
-            return None;
-        }
+            return Self::Empty;
+        };
 
         let mut parts = line.splitn(2, '=');
 
@@ -62,101 +69,129 @@ impl<'a> LineParser {
 
                 match (first, last) {
                     (Some(D_QUOTE), Some(D_QUOTE)) => {
-                        let val = Self::replace_new_line(v.trim_matches(D_QUOTE));
+                        let val = replace_new_line(v.trim_matches(D_QUOTE));
 
-                        Some((key, val))
+                        Line::KeyVal(key, val)
                     }
-                    (Some(QUOTE), Some(QUOTE)) => Some((key, v.trim_matches(QUOTE).into())),
-                    _ => Some((key, v.trim().to_string())),
+                    (Some(QUOTE), Some(QUOTE)) => Line::KeyVal(key, v.trim_matches(QUOTE).into()),
+                    _ => Line::KeyVal(key, v.trim().to_string()),
                 }
             }
-            _ => None,
+            _ => Self::Empty,
         }
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+#[derive(Debug)]
+pub struct Lines {
+    lines: Vec<Line>,
+}
 
-    #[test]
-    fn parse_line_key_val_test() {
-        let (key, val) = LineParser::parse_line("HELLO=world").unwrap();
-        assert_eq!(key, "HELLO");
-        assert_eq!(val, "world");
-    }
+impl From<String> for Lines {
+    fn from(lines: String) -> Self {
+        let lines: Vec<Line> = lines.split(NLINE).into_iter().map(Line::from).collect();
 
-    #[test]
-    fn parse_line_only_key_test() {
-        let (key, val) = LineParser::parse_line("HELLO=").unwrap();
-        assert_eq!(key, "HELLO");
-        assert_eq!(val, "");
-    }
-
-    #[test]
-    fn parse_line_spaces_trimmed_test() {
-        let (key, val) = LineParser::parse_line("FOO= This is spaces ").unwrap();
-        assert_eq!(key, "FOO");
-        assert_eq!(val, "This is spaces");
-    }
-
-    #[test]
-    fn parse_line_single_double_quote_end_start_test() {
-        let (key, val) = LineParser::parse_line("FOO='inside quote'").unwrap();
-        let (key2, val2) = LineParser::parse_line(r#"FOO="inside double quote""#).unwrap();
-        assert_eq!(key, "FOO");
-        assert_eq!(val, "inside quote");
-        assert_eq!(key2, "FOO");
-        assert_eq!(val2, "inside double quote");
-    }
-
-    #[test]
-    fn parse_line_spaces_preserved_test() {
-        let (key, val) = LineParser::parse_line("FOO=' inside quote '").unwrap();
-        let (key2, val2) = LineParser::parse_line(r#"FOO=" inside double quote ""#).unwrap();
-        assert_eq!(key, "FOO");
-        assert_eq!(val, " inside quote ");
-        assert_eq!(key2, "FOO");
-        assert_eq!(val2, " inside double quote ");
-    }
-
-    #[test]
-    fn parse_line_json_test() {
-        let (key, val) = LineParser::parse_line(r#"JSON={"foo": "bar"}"#).unwrap();
-        assert_eq!(key, "JSON");
-        assert_eq!(val, r#"{"foo": "bar"}"#);
-    }
-
-    #[test]
-    fn parse_line_commented_test() {
-        let empty = LineParser::parse_line("# FOO=bar");
-        assert_eq!(empty, None);
-    }
-
-    #[test]
-    fn parse_line_empty_test() {
-        let empty = LineParser::parse_line("");
-        assert_eq!(empty, None);
-    }
-
-    #[test]
-    fn parse_line_newline_char_test() {
-        let (key, val) = LineParser::parse_line(r#"WHAT="You\nAre\nAwesome""#).unwrap();
-        assert_eq!(key, "WHAT");
-        assert_eq!(val, "You\nAre\nAwesome");
-    }
-
-    #[test]
-    fn parse_line_escaped_newline_char_test() {
-        let (key, val) = LineParser::parse_line(r#"WHAT="You\\nAre\\nAwesome""#).unwrap();
-        assert_eq!(key, "WHAT");
-        assert_eq!(val, r#"You\\nAre\\nAwesome"#);
-    }
-
-    #[test]
-    fn parse_line_no_newline_char_test() {
-        let (key, val) = LineParser::parse_line(r#"WHAT='You\nAre\nAwesome'"#).unwrap();
-        assert_eq!(key, "WHAT");
-        assert_eq!(val, "You\\nAre\\nAwesome");
+        Self { lines }
     }
 }
+
+impl Lines {
+    pub fn into_hash_map(self) -> HashMap<String, String> {
+        let lines = self.lines;
+        let mut hash = HashMap::with_capacity(lines.len());
+
+        for line in lines {
+            if let Line::KeyVal(k, v) = line {
+                hash.insert(k, v);
+            }
+        }
+
+        hash
+    }
+}
+
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+//
+//     #[test]
+//     fn parse_line_key_val_test() {
+//         let (key, val) = Line::from("HELLO=world");
+//         assert_eq!(key, "HELLO");
+//         assert_eq!(val, "world");
+//     }
+//
+//     #[test]
+//     fn parse_line_only_key_test() {
+//         let (key, val) = Line::from("HELLO=").unwrap();
+//         assert_eq!(key, "HELLO");
+//         assert_eq!(val, "");
+//     }
+//
+//     #[test]
+//     fn parse_line_spaces_trimmed_test() {
+//         let (key, val) = Line::from("FOO= This is spaces ").unwrap();
+//         assert_eq!(key, "FOO");
+//         assert_eq!(val, "This is spaces");
+//     }
+//
+//     #[test]
+//     fn parse_line_single_double_quote_end_start_test() {
+//         let (key, val) = Line::from("FOO='inside quote'").unwrap();
+//         let (key2, val2) = Line::from(r#"FOO="inside double quote""#).unwrap();
+//         assert_eq!(key, "FOO");
+//         assert_eq!(val, "inside quote");
+//         assert_eq!(key2, "FOO");
+//         assert_eq!(val2, "inside double quote");
+//     }
+//
+//     #[test]
+//     fn parse_line_spaces_preserved_test() {
+//         let (key, val) = Line::from("FOO=' inside quote '").unwrap();
+//         let (key2, val2) = Line::from(r#"FOO=" inside double quote ""#).unwrap();
+//         assert_eq!(key, "FOO");
+//         assert_eq!(val, " inside quote ");
+//         assert_eq!(key2, "FOO");
+//         assert_eq!(val2, " inside double quote ");
+//     }
+//
+//     #[test]
+//     fn parse_line_json_test() {
+//         let (key, val) = Line::from(r#"JSON={"foo": "bar"}"#).unwrap();
+//         assert_eq!(key, "JSON");
+//         assert_eq!(val, r#"{"foo": "bar"}"#);
+//     }
+//
+//     #[test]
+//     fn parse_line_commented_test() {
+//         let empty = Line::from("# FOO=bar");
+//         assert_eq!(empty, None);
+//     }
+//
+//     #[test]
+//     fn parse_line_empty_test() {
+//         let empty = Line::from("");
+//         assert_eq!(empty, None);
+//     }
+//
+//     #[test]
+//     fn parse_line_newline_char_test() {
+//         let (key, val) = Line::from(r#"WHAT="You\nAre\nAwesome""#).unwrap();
+//         assert_eq!(key, "WHAT");
+//         assert_eq!(val, "You\nAre\nAwesome");
+//     }
+//
+//     #[test]
+//     fn parse_line_escaped_newline_char_test() {
+//         let (key, val) = Line::from(r#"WHAT="You\\nAre\\nAwesome""#).unwrap();
+//         assert_eq!(key, "WHAT");
+//         assert_eq!(val, r#"You\\nAre\\nAwesome"#);
+//     }
+//
+//     #[test]
+//     fn parse_line_no_newline_char_test() {
+//         let (key, val) = Line::from(r#"WHAT='You\nAre\nAwesome'"#).unwrap();
+//         assert_eq!(key, "WHAT");
+//         assert_eq!(val, "You\\nAre\\nAwesome");
+//     }
+// }
