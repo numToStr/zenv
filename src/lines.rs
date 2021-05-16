@@ -1,10 +1,11 @@
 use std::collections::HashMap;
 
+const B_SLASH: char = '\\';
 const NLINE: char = '\n';
 const QUOTE: char = '\'';
 const D_QUOTE: char = '"';
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Line {
     KeyVal(String, String),
     Empty,
@@ -18,13 +19,16 @@ impl Line {
         loop {
             match chars.next() {
                 // If escape char is found
-                Some(x) if x == '\\' => {
-                    s.push_str(r#"\\"#);
-
-                    if let Some(any) = chars.next() {
-                        s.push(any);
+                Some(x) if x == B_SLASH => match chars.next() {
+                    Some(n) if n == 'n' => {
+                        s.push(NLINE);
                     }
-                }
+                    Some(n) => {
+                        s.push(x);
+                        s.push(n);
+                    }
+                    None => s.push(x),
+                },
                 // chars() automagically converts \n into LF
                 // no special handling of new line character
                 Some(x) => s.push(x),
