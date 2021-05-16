@@ -14,14 +14,14 @@ pub use parser::LineParser;
 pub use substitution::Substitution;
 
 #[derive(Debug)]
-pub struct Denv {
+pub struct Zenv {
     path: PathBuf,
     expand: bool,
 }
 
-impl Denv {
-    pub fn new(path: PathBuf, expand: bool) -> Denv {
-        Denv { path, expand }
+impl Zenv {
+    pub fn new(path: PathBuf, expand: bool) -> Self {
+        Self { path, expand }
     }
 
     pub fn read(&self) -> Result<Lines<BufReader<File>>> {

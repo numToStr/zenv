@@ -3,13 +3,13 @@ use std::process::exit;
 use std::process::{Command, Stdio};
 
 use cli::Cli;
-use denv::Denv;
+use zenv::Zenv;
 
 const HELP: &'static str = "\
-denv - Dotenv (.env) loader written in rust
+zenv - Dotenv (.env) loader written in rust
 
 USAGE:
-  denv [FLAGS] [OPTIONS] -- <binary> [args]...
+  zenv [FLAGS] [OPTIONS] -- <binary> [args]...
 
 FLAGS:
   -h, --help            Prints help information
@@ -23,9 +23,9 @@ ARGS:
     [args]...           Arguments for the command
 
 Examples:
-    denv -f .env -- node index.js
-    denv -f .env -- npm run dev
-    denv -f .env -- terraform apply
+    zenv -f .env -- node index.js
+    zenv -f .env -- npm run dev
+    zenv -f .env -- terraform apply
 ";
 
 fn main() {
@@ -40,7 +40,7 @@ fn main() {
 
     let binary = assert_arg!(args.binary, "<binary> name is required");
 
-    let vars = assert_result!(Denv::new(fpath, args.expand).parse());
+    let vars = assert_result!(Zenv::new(fpath, args.expand).parse());
 
     // for (key, val) in &vars {
     //     println!("{} {}", key, val);
