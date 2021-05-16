@@ -97,6 +97,44 @@ impl Lines {
 
         hash
     }
+
+    pub fn expand(self) -> HashMap<String, String> {
+        let mut vars = Self::into_hash_map(self);
+        let cloned = vars.clone();
+
+        for (k, v) in cloned {
+            let mut new_val = String::with_capacity(v.len());
+            let mut v_chars = v.chars();
+
+            loop {
+                match v_chars.next() {
+                    Some('$') => {
+                        let x: String = v_chars
+                            .by_ref()
+                            .take_while(|c| c.is_alphanumeric() || c == &'_')
+                            .collect();
+
+                        if let Some(found) = vars.get(&x) {
+                            new_val.push_str(found);
+
+                            // Need to find the terminator charactor
+                            // Which is also consumed by the take_while() above
+                            let idx = v_chars.clone().count();
+                            if let Some(consumed) = v.chars().rev().skip(idx).take(1).next() {
+                                new_val.push(consumed);
+                            };
+                        }
+                    }
+                    Some(a) => new_val.push(a),
+                    _ => break,
+                }
+            }
+
+            vars.insert(k.to_string(), new_val);
+        }
+
+        vars
+    }
 }
 
 #[cfg(test)]

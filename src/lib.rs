@@ -1,10 +1,8 @@
 mod lines;
-mod substitution;
 use std::{collections::HashMap, fs::read_to_string, io::Result, path::PathBuf};
 
 // Just re-exporting to use as a standalone parser
 pub use lines::{Line, Lines};
-pub use substitution::Substitution;
 
 #[derive(Debug)]
 pub struct Zenv {
@@ -23,11 +21,12 @@ impl Zenv {
             Lines::from(r)
         };
 
-        let mut hash = lines.into_hash_map();
+        let hash = match self.expand {
+            true => lines.expand(),
+            false => lines.into_hash_map(),
+        };
 
-        if self.expand {
-            Substitution::new(&mut hash).substitute();
-        }
+        println!("{:#?}", hash);
 
         Ok(hash)
     }
