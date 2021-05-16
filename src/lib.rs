@@ -1,9 +1,10 @@
-mod parser;
+mod lines;
+mod replacer;
 mod substitution;
 use std::{collections::HashMap, fs::read_to_string, io::Result, path::PathBuf};
 
 // Just re-exporting to use as a standalone parser
-pub use parser::{Line, Lines};
+pub use lines::{Line, Lines};
 pub use substitution::Substitution;
 
 #[derive(Debug)]
