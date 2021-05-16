@@ -1,6 +1,6 @@
 const QUOTE: char = '\'';
 const D_QUOTE: char = '"';
-const N_LINE: &'static str = "\\n";
+const N_LINE: &str = "\\n";
 
 pub struct LineParser;
 
@@ -10,10 +10,7 @@ impl<'a> LineParser {
             Some(pos) => {
                 // New line can be at the start of the string
                 let is_escaped = match pos.checked_sub(1) {
-                    Some(idx) => match line.chars().nth(idx) {
-                        Some('\\') => true,
-                        _ => false,
-                    },
+                    Some(idx) => matches!(line.chars().nth(idx), Some('\\')),
                     _ => false,
                 };
 

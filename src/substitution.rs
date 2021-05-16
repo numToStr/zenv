@@ -20,7 +20,7 @@ impl<'a> Substitution<'a> {
                     None => value.len() - start,
                 };
 
-                return (start, count);
+                (start, count)
             }
             None => (0, 0),
         }
