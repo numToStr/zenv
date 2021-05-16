@@ -1,6 +1,6 @@
-use crate::replacer::{replace_new_line, NLINE};
 use std::collections::HashMap;
 
+const NLINE: char = '\n';
 const QUOTE: char = '\'';
 const D_QUOTE: char = '"';
 
@@ -8,6 +8,32 @@ const D_QUOTE: char = '"';
 pub enum Line {
     KeyVal(String, String),
     Empty,
+}
+
+impl Line {
+    fn replace_lf(line: &str) -> String {
+        let mut s = String::with_capacity(line.len());
+        let mut chars = line.chars();
+
+        loop {
+            match chars.next() {
+                // If escape char is found
+                Some(x) if x == '\\' => {
+                    s.push_str(r#"\\"#);
+
+                    if let Some(any) = chars.next() {
+                        s.push(any);
+                    }
+                }
+                // chars() automagically converts \n into LF
+                // no special handling of new line character
+                Some(x) => s.push(x),
+                _ => break,
+            }
+        }
+
+        s
+    }
 }
 
 impl From<&str> for Line {
@@ -28,7 +54,7 @@ impl From<&str> for Line {
 
                 match (first, last) {
                     (Some(D_QUOTE), Some(D_QUOTE)) => {
-                        let val = replace_new_line(v.trim_matches(D_QUOTE));
+                        let val = Self::replace_lf(v.trim_matches(D_QUOTE));
 
                         Line::KeyVal(key, val)
                     }

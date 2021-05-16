@@ -1,5 +1,4 @@
 mod lines;
-mod replacer;
 mod substitution;
 use std::{collections::HashMap, fs::read_to_string, io::Result, path::PathBuf};
 
