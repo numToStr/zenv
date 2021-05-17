@@ -23,7 +23,7 @@ define release
 	git commit -a -m "Release $(1)"
 	git tag v$(1) -m "Release $(1)"
 	echo ">> Push Tags"
-	git push --tags
+	git push origin v$(1)
 	echo ">> All mighty push"
 	git push
 endef
