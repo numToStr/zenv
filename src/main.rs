@@ -9,14 +9,14 @@ const HELP: &str = "\
 zenv - Dotenv (.env) loader written in rust
 
 USAGE:
-  zenv [FLAGS] [OPTIONS] -- <binary> [args]...
+    zenv [FLAGS] [OPTIONS] -- <binary> [args]...
 
 FLAGS:
-  -h, --help            Prints help information
-  -x, --expand          Enable variable expansion
+    -h, --help            Prints help information
+    -x, --expand          Enable variable expansion
 
 OPTIONS:
-  -f, --file            Path to .env file
+    -f, --file            Path to .env file
 
 ARGS:
     <binary>            Command that needs to be executed
@@ -28,37 +28,46 @@ Examples:
     zenv -f .env -- terraform apply
 ";
 
-fn main() {
-    let args = assert_result!(Cli::parse());
+fn bootstrap() -> Result<i32, String> {
+    let args = Cli::parse()?;
 
     if args.help {
         print!("{}", HELP);
-        exit(0)
+        return Ok(0);
     }
 
-    let fpath = assert_arg!(args.path, "-f/--file option is required");
+    let fpath = args.path()?;
 
-    let binary = assert_arg!(args.binary, "<binary> name is required");
+    let binary = args.binary()?;
 
-    let vars = assert_result!(Zenv::new(fpath, args.expand).parse());
+    let vars = Zenv::new(fpath.to_owned(), args.expand)
+        .parse()
+        .map_err(|e| e.to_string())?;
 
-    // for (key, val) in &vars {
-    //     println!("{} {}", key, val);
-    // }
-
-    let mut program = assert_result!(Command::new(&binary)
-        .args(args.bin_args)
+    let mut program = Command::new(&binary)
+        .args(&args.bin_args)
         .stdin(Stdio::inherit())
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .envs(vars)
         .spawn()
-        .map_err(|_| format!("Unable to spawn program - `{}`", binary.to_str().unwrap())));
+        .map_err(|_| format!("Unable to spawn program - `{}`", binary.to_str().unwrap()))?;
 
-    let code = {
-        let exit_status = assert_result!(program.wait().map_err(|_| "Failed to grab exit code"));
-        exit_status.code().unwrap_or(1)
+    let code = program
+        .wait()
+        .map_err(|e| e.to_string())?
+        .code()
+        .ok_or_else(|| "Failed to grab the exit code".to_string())?;
+
+    Ok(code)
+}
+
+fn main() {
+    match bootstrap() {
+        Ok(code) => exit(code),
+        Err(e) => {
+            eprintln!("{}", e);
+            exit(1)
+        }
     };
-
-    exit(code)
 }

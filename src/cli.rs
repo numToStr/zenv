@@ -1,6 +1,7 @@
 use std::ffi::OsString;
 use std::path::PathBuf;
-use std::process::exit;
+
+use pico_args::Arguments;
 
 pub struct Cli {
     // Print help information
@@ -10,17 +11,17 @@ pub struct Cli {
     pub expand: bool,
 
     // Path to .env file
-    pub path: Option<PathBuf>,
+    path: Option<PathBuf>,
 
     // Name of the command
-    pub binary: Option<OsString>,
+    binary: Option<OsString>,
 
     // Arguments of the command
     pub bin_args: Vec<OsString>,
 }
 
 impl Cli {
-    pub fn parse() -> Result<Cli, pico_args::Error> {
+    pub fn parse() -> Result<Cli, String> {
         // `from_vec` takes `OsString`, not `String`.
         let mut args: Vec<_> = std::env::args_os().collect();
         args.remove(0); // remove the executable path.
@@ -37,12 +38,14 @@ impl Cli {
         };
 
         // Now pass the remaining arguments through to `pico_args`.
-        let mut args = pico_args::Arguments::from_vec(args);
+        let mut args = Arguments::from_vec(args);
         let mut bin_args = bin_args.into_iter();
         let res = Cli {
             help: args.contains(["-h", "--help"]),
             expand: args.contains(["-x", "--expand"]),
-            path: args.opt_value_from_str(["-f", "--file"])?,
+            path: args
+                .opt_value_from_str(["-f", "--file"])
+                .map_err(|e| e.to_string())?,
             binary: bin_args.next(),
             bin_args: bin_args.collect(),
         };
@@ -50,36 +53,17 @@ impl Cli {
         // It's up to the caller what to do with the remaining arguments.
         let remaining = args.finish();
         if !remaining.is_empty() {
-            eprintln!("Unknown arguments: {:?}", remaining);
-            exit(1)
+            return Err(format!("Unknown arguments: {:?}", remaining));
         }
 
         Ok(res)
     }
-}
 
-#[macro_export]
-macro_rules! assert_arg {
-    ($val:expr, $flag:expr) => {
-        match $val {
-            Some(v) => v,
-            _ => {
-                eprintln!("ERROR:: {}", $flag);
-                exit(1)
-            }
-        }
-    };
-}
+    pub fn path(&self) -> Result<&PathBuf, &str> {
+        self.path.as_ref().ok_or("-f/--file option is required")
+    }
 
-#[macro_export]
-macro_rules! assert_result {
-    ($val:expr) => {
-        match $val {
-            Ok(v) => v,
-            Err(err) => {
-                eprintln!("ERROR:: {}", err);
-                exit(1)
-            }
-        }
-    };
+    pub fn binary(&self) -> Result<&OsString, &str> {
+        self.binary.as_ref().ok_or("<binary> name is required")
+    }
 }

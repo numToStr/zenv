@@ -26,8 +26,6 @@ impl Zenv {
             false => lines.into_hash_map(),
         };
 
-        println!("{:#?}", hash);
-
         Ok(hash)
     }
 
