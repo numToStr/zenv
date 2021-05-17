@@ -120,7 +120,7 @@ jobs:
               with:
                   use-cross: ${{ matrix.job.use_cross }}
                   command: build
-                  args: --release --target=${{ matrix.job.target }}
+                  args: --release --features=cli --target=${{ matrix.job.target }}
 
             # - name: Upload build artifacts
             #   uses: actions/upload-artifact@v2
@@ -172,7 +172,7 @@ jobs:
               uses: actions-rs/cargo@v1
               with:
                   command: publish
-                  args: --verbose --token ${{ secrets.CARGO_TOKEN }}
+                  args: --verbose --all-features --token ${{ secrets.CARGO_TOKEN }}
 
     # publish_aur_package:
     #     name: Publish AUR package
