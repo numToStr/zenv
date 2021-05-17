@@ -3,6 +3,8 @@ use std::path::PathBuf;
 
 use pico_args::Arguments;
 
+use crate::info::{DESC, NAME, VERSION};
+
 pub struct Cli {
     // Print help information
     pub help: bool,
@@ -65,5 +67,36 @@ impl Cli {
 
     pub fn binary(&self) -> Result<&OsString, &str> {
         self.binary.as_ref().ok_or("<binary> name is required")
+    }
+
+    pub fn help_doc() -> String {
+        format!(
+            "\
+{name} {ver}
+{desc}
+
+USAGE:
+    zenv [FLAGS] [OPTIONS] -- <binary> [args]...
+
+FLAGS:
+    -h, --help          Prints help information
+    -x, --expand        Enable variable expansion
+
+OPTIONS:
+    -f, --file          Path to .env file
+
+ARGS:
+    <binary>            Command that needs to be executed
+    [args]...           Arguments for the command
+
+Examples:
+    {name} -f .env -- node index.js
+    {name} -f .env -- npm run dev
+    {name} -f .env -- terraform apply
+",
+            name = NAME,
+            ver = VERSION,
+            desc = DESC,
+        )
     }
 }

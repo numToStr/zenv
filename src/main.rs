@@ -1,38 +1,16 @@
 mod cli;
+mod info;
 use std::process::exit;
 use std::process::{Command, Stdio};
 
 use cli::Cli;
 use zenv::Zenv;
 
-const HELP: &str = "\
-zenv - Dotenv (.env) loader written in rust
-
-USAGE:
-    zenv [FLAGS] [OPTIONS] -- <binary> [args]...
-
-FLAGS:
-    -h, --help            Prints help information
-    -x, --expand          Enable variable expansion
-
-OPTIONS:
-    -f, --file            Path to .env file
-
-ARGS:
-    <binary>            Command that needs to be executed
-    [args]...           Arguments for the command
-
-Examples:
-    zenv -f .env -- node index.js
-    zenv -f .env -- npm run dev
-    zenv -f .env -- terraform apply
-";
-
 fn bootstrap() -> Result<i32, String> {
     let args = Cli::parse()?;
 
     if args.help {
-        print!("{}", HELP);
+        print!("{}", Cli::help_doc());
         return Ok(0);
     }
 
