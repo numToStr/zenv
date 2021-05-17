@@ -9,6 +9,8 @@ pub struct Cli {
     // Print help information
     pub help: bool,
 
+    pub version: bool,
+
     // Whether to substitute variables or not
     pub expand: bool,
 
@@ -44,6 +46,7 @@ impl Cli {
         let mut bin_args = bin_args.into_iter();
         let res = Cli {
             help: args.contains(["-h", "--help"]),
+            version: args.contains(["-v", "--version"]),
             expand: args.contains(["-x", "--expand"]),
             path: args
                 .opt_value_from_str(["-f", "--file"])
@@ -76,9 +79,10 @@ impl Cli {
 {desc}
 
 USAGE:
-    zenv [FLAGS] [OPTIONS] -- <binary> [args]...
+    {name} [FLAGS] [OPTIONS] -- <binary> [args]...
 
 FLAGS:
+    -v, --version       Prints version
     -h, --help          Prints help information
     -x, --expand        Enable variable expansion
 

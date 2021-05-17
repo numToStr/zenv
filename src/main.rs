@@ -6,8 +6,15 @@ use std::process::{Command, Stdio};
 use cli::Cli;
 use zenv::Zenv;
 
+use crate::info::{NAME, VERSION};
+
 fn bootstrap() -> Result<i32, String> {
     let args = Cli::parse()?;
+
+    if args.version {
+        println!("{} {}", NAME, VERSION);
+        return Ok(0);
+    }
 
     if args.help {
         print!("{}", Cli::help_doc());
