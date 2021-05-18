@@ -51,7 +51,7 @@ fn main() {
     match bootstrap() {
         Ok(code) => exit(code),
         Err(e) => {
-            eprintln!("{}", e);
+            eprintln!("ERROR :: {}", e);
             exit(1)
         }
     };
