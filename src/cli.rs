@@ -64,8 +64,13 @@ impl Cli {
         Ok(res)
     }
 
-    pub fn path(&self) -> Result<&PathBuf, &str> {
-        self.path.as_ref().ok_or("-f/--file option is required")
+    pub fn path(&self) -> Result<&PathBuf, String> {
+        let p = self.path.as_ref().ok_or("-f/--file option is required")?;
+
+        match p.exists() {
+            true => Ok(p),
+            false => Err(format!("Unable to find file - `{}`", p.display())),
+        }
     }
 
     pub fn binary(&self) -> Result<&OsString, &str> {
