@@ -81,6 +81,32 @@ fn expand_newlines() {
 }
 
 #[test]
+fn escaped_newlines_dquote() {
+    let res = Line::from(r#"ESCAPED_NEWLINES_DQUOTE="escaped\\nnew\\nlines""#);
+
+    assert_eq!(
+        res,
+        Line::KeyVal(
+            "ESCAPED_NEWLINES_DQUOTE".to_string(),
+            "escaped\\nnew\\nlines".to_string()
+        )
+    )
+}
+
+#[test]
+fn escaped_newlines_squote() {
+    let res = Line::from("ESCAPED_NEWLINES_SQUOTE='escaped\\nnew\\nlines'");
+
+    assert_eq!(
+        res,
+        Line::KeyVal(
+            "ESCAPED_NEWLINES_SQUOTE".to_string(),
+            "escaped\\nnew\\nlines".to_string()
+        )
+    )
+}
+
+#[test]
 fn dont_expand_unquoted() {
     let res = Line::from("DONT_EXPAND_UNQUOTED=dont\nexpand\nnew\nlines");
 
@@ -208,6 +234,13 @@ fn trim_space_from_unquoted() {
 }
 
 #[test]
+fn just_space() {
+    let res = Line::from("      ");
+
+    assert_eq!(res, Line::Empty)
+}
+
+#[test]
 fn spaced_key() {
     let res = Line::from("    SPACED_KEY = spaced_key");
 
@@ -218,18 +251,45 @@ fn spaced_key() {
 }
 
 #[test]
-fn comment() {
+fn comment_basic() {
     let res = Line::from("# COMMENT=comment");
 
     assert_eq!(res, Line::Empty)
 }
 
 #[test]
-fn comment_at_end() {
+fn comment_at_end_unquoted() {
     let res = Line::from("COMMENT_AT_END=comment_at_end # this is the comment");
 
     assert_eq!(
         res,
         Line::KeyVal("COMMENT_AT_END".to_string(), "comment_at_end".to_string())
+    )
+}
+
+#[test]
+fn comment_at_end_squote() {
+    let res =
+        Line::from("COMMENT_AT_END_SQUOTE='comment_at_##_end_squote_#' # this is the comment");
+
+    assert_eq!(
+        res,
+        Line::KeyVal(
+            "COMMENT_AT_END_SQUOTE".to_string(),
+            "comment_at_##_end_squote_#".to_string()
+        )
+    )
+}
+
+#[test]
+fn comment_at_end_dquote() {
+    let res = Line::from("COMMENT_AT_END_DQUOTE=\"comment_at_#_end_dquote\" # this is the comment");
+
+    assert_eq!(
+        res,
+        Line::KeyVal(
+            "COMMENT_AT_END_DQUOTE".to_string(),
+            "comment_at_#_end_dquote".to_string()
+        )
     )
 }
