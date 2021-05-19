@@ -4,6 +4,7 @@ const B_SLASH: char = '\\';
 const NLINE: char = '\n';
 const QUOTE: char = '\'';
 const D_QUOTE: char = '"';
+const HASH: char = '#';
 
 #[derive(Debug, PartialEq)]
 pub enum Line {
@@ -42,7 +43,7 @@ impl Line {
 
 impl From<&str> for Line {
     fn from(line: &str) -> Self {
-        if line.is_empty() || line.starts_with('#') {
+        if line.is_empty() || line.starts_with(HASH) {
             return Self::Empty;
         };
 
@@ -54,16 +55,27 @@ impl From<&str> for Line {
                 let mut chars = v.chars();
 
                 let first = chars.next();
-                let last = chars.next_back();
 
-                match (first, last) {
-                    (Some(D_QUOTE), Some(D_QUOTE)) => {
-                        let val = Self::replace_lf(v.trim_matches(D_QUOTE));
+                match first {
+                    Some(D_QUOTE) => {
+                        let val = {
+                            let v: String = chars.take_while(|x| x != &D_QUOTE).collect();
+                            Self::replace_lf(&v)
+                        };
 
                         Line::KeyVal(key, val)
                     }
-                    (Some(QUOTE), Some(QUOTE)) => Line::KeyVal(key, v.trim_matches(QUOTE).into()),
-                    _ => Line::KeyVal(key, v.trim().to_string()),
+                    Some(QUOTE) => {
+                        let val: String = chars.take_while(|x| x != &QUOTE).collect();
+
+                        Line::KeyVal(key, val)
+                    }
+                    Some(a) => {
+                        let val: String = chars.take_while(|x| x != &HASH).collect();
+
+                        Line::KeyVal(key, format!("{}{}", a, val.trim()).trim().to_owned())
+                    }
+                    _ => Line::KeyVal(key, String::new()),
                 }
             }
             _ => Self::Empty,
