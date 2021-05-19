@@ -78,7 +78,7 @@ pub struct Lines {
 
 impl From<String> for Lines {
     fn from(lines: String) -> Self {
-        let lines: Vec<Line> = lines.split(NLINE).into_iter().map(Line::from).collect();
+        let lines: Vec<Line> = lines.lines().into_iter().map(Line::from).collect();
 
         Self { lines }
     }
