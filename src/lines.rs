@@ -149,97 +149,97 @@ impl Lines {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn parse_line_key_val_test() {
-        if let Line::KeyVal(key, val) = Line::from("HELLO=world") {
-            assert_eq!(key, "HELLO");
-            assert_eq!(val, "world");
-        }
-    }
-
-    #[test]
-    fn parse_line_only_key_test() {
-        if let Line::KeyVal(key, val) = Line::from("HELLO=") {
-            assert_eq!(key, "HELLO");
-            assert_eq!(val, "");
-        }
-    }
-
-    #[test]
-    fn parse_line_spaces_trimmed_test() {
-        if let Line::KeyVal(key, val) = Line::from("FOO= This is spaces ") {
-            assert_eq!(key, "FOO");
-            assert_eq!(val, "This is spaces");
-        }
-    }
-
-    #[test]
-    fn parse_line_single_double_quote_end_start_test() {
-        if let Line::KeyVal(key, val) = Line::from("FOO='inside quote'") {
-            assert_eq!(key, "FOO");
-            assert_eq!(val, "inside quote");
-        }
-        if let Line::KeyVal(key2, val2) = Line::from(r#"FOO="inside double quote""#) {
-            assert_eq!(key2, "FOO");
-            assert_eq!(val2, "inside double quote");
-        }
-    }
-
-    #[test]
-    fn parse_line_spaces_preserved_test() {
-        if let Line::KeyVal(key, val) = Line::from("FOO=' inside quote '") {
-            assert_eq!(key, "FOO");
-            assert_eq!(val, " inside quote ");
-        }
-        if let Line::KeyVal(key2, val2) = Line::from(r#"FOO=" inside double quote ""#) {
-            assert_eq!(key2, "FOO");
-            assert_eq!(val2, " inside double quote ");
-        }
-    }
-
-    #[test]
-    fn parse_line_json_test() {
-        if let Line::KeyVal(key, val) = Line::from(r#"JSON={"foo": "bar"}"#) {
-            assert_eq!(key, "JSON");
-            assert_eq!(val, r#"{"foo": "bar"}"#);
-        }
-    }
-
-    #[test]
-    fn parse_line_commented_test() {
-        assert_eq!(Line::from("# FOO=bar"), Line::Empty);
-    }
-
-    #[test]
-    fn parse_line_empty_test() {
-        assert_eq!(Line::from(""), Line::Empty);
-    }
-
-    #[test]
-    fn parse_line_newline_char_test() {
-        if let Line::KeyVal(key, val) = Line::from(r#"WHAT="You\nAre\nAwesome""#) {
-            assert_eq!(key, "WHAT");
-            assert_eq!(val, "You\nAre\nAwesome");
-        }
-    }
-
-    #[test]
-    fn parse_line_escaped_newline_char_test() {
-        if let Line::KeyVal(key, val) = Line::from(r#"WHAT="You\\nAre\\nAwesome""#) {
-            assert_eq!(key, "WHAT");
-            assert_eq!(val, r#"You\\nAre\\nAwesome"#);
-        }
-    }
-
-    #[test]
-    fn parse_line_no_newline_char_test() {
-        if let Line::KeyVal(key, val) = Line::from(r#"WHAT='You\nAre\nAwesome'"#) {
-            assert_eq!(key, "WHAT");
-            assert_eq!(val, "You\\nAre\\nAwesome");
-        }
-    }
-}
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+//
+//     #[test]
+//     fn parse_line_key_val_test() {
+//         if let Line::KeyVal(key, val) = Line::from("HELLO=world") {
+//             assert_eq!(key, "HELLO");
+//             assert_eq!(val, "world");
+//         }
+//     }
+//
+//     #[test]
+//     fn parse_line_only_key_test() {
+//         if let Line::KeyVal(key, val) = Line::from("HELLO=") {
+//             assert_eq!(key, "HELLO");
+//             assert_eq!(val, "");
+//         }
+//     }
+//
+//     #[test]
+//     fn parse_line_spaces_trimmed_test() {
+//         if let Line::KeyVal(key, val) = Line::from("FOO= This is spaces ") {
+//             assert_eq!(key, "FOO");
+//             assert_eq!(val, "This is spaces");
+//         }
+//     }
+//
+//     #[test]
+//     fn parse_line_single_double_quote_end_start_test() {
+//         if let Line::KeyVal(key, val) = Line::from("FOO='inside quote'") {
+//             assert_eq!(key, "FOO");
+//             assert_eq!(val, "inside quote");
+//         }
+//         if let Line::KeyVal(key2, val2) = Line::from(r#"FOO="inside double quote""#) {
+//             assert_eq!(key2, "FOO");
+//             assert_eq!(val2, "inside double quote");
+//         }
+//     }
+//
+//     #[test]
+//     fn parse_line_spaces_preserved_test() {
+//         if let Line::KeyVal(key, val) = Line::from("FOO=' inside quote '") {
+//             assert_eq!(key, "FOO");
+//             assert_eq!(val, " inside quote ");
+//         }
+//         if let Line::KeyVal(key2, val2) = Line::from(r#"FOO=" inside double quote ""#) {
+//             assert_eq!(key2, "FOO");
+//             assert_eq!(val2, " inside double quote ");
+//         }
+//     }
+//
+//     #[test]
+//     fn parse_line_json_test() {
+//         if let Line::KeyVal(key, val) = Line::from(r#"JSON={"foo": "bar"}"#) {
+//             assert_eq!(key, "JSON");
+//             assert_eq!(val, r#"{"foo": "bar"}"#);
+//         }
+//     }
+//
+//     #[test]
+//     fn parse_line_commented_test() {
+//         assert_eq!(Line::from("# FOO=bar"), Line::Empty);
+//     }
+//
+//     #[test]
+//     fn parse_line_empty_test() {
+//         assert_eq!(Line::from(""), Line::Empty);
+//     }
+//
+//     #[test]
+//     fn parse_line_newline_char_test() {
+//         if let Line::KeyVal(key, val) = Line::from(r#"WHAT="You\nAre\nAwesome""#) {
+//             assert_eq!(key, "WHAT");
+//             assert_eq!(val, "You\nAre\nAwesome");
+//         }
+//     }
+//
+//     #[test]
+//     fn parse_line_escaped_newline_char_test() {
+//         if let Line::KeyVal(key, val) = Line::from(r#"WHAT="You\\nAre\\nAwesome""#) {
+//             assert_eq!(key, "WHAT");
+//             assert_eq!(val, r#"You\\nAre\\nAwesome"#);
+//         }
+//     }
+//
+//     #[test]
+//     fn parse_line_no_newline_char_test() {
+//         if let Line::KeyVal(key, val) = Line::from(r#"WHAT='You\nAre\nAwesome'"#) {
+//             assert_eq!(key, "WHAT");
+//             assert_eq!(val, "You\\nAre\\nAwesome");
+//         }
+//     }
+// }
