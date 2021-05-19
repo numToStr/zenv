@@ -73,7 +73,7 @@ impl From<&str> for Line {
                     Some(a) => {
                         let val: String = chars.take_while(|x| x != &HASH).collect();
 
-                        Line::KeyVal(key, format!("{}{}", a, val.trim()).trim().to_string())
+                        Line::KeyVal(key, format!("{}{}", a, val).trim().to_string())
                     }
                     _ => Line::KeyVal(key, String::new()),
                 }
