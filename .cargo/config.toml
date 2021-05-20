@@ -2,6 +2,7 @@
 rr = 'run --features=cli'
 bb = 'build --features=cli --release'
 ii = "install --features=cli --path ."
+t = "test --no-fail-fast"
 run_win = "run --features=cli --target=x86_64-pc-windows-gnu"
 build_win = "build --features=cli --target=x86_64-pc-windows-gnu --release"
 build_linux = "build --features=cli --target=x86_64-unknown-linux-gnu --release"
