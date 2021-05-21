@@ -113,7 +113,14 @@ pub struct Lines {
 
 impl From<String> for Lines {
     fn from(lines: String) -> Self {
-        let lines: Vec<Line> = lines.lines().into_iter().map(Line::from).collect();
+        let lines: Vec<Line> = lines
+            .lines()
+            .into_iter()
+            .filter_map(|x| match Line::from(x) {
+                Line::Empty => None,
+                x => Some(x),
+            })
+            .collect();
 
         Self { lines }
     }
