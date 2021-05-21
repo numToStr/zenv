@@ -87,15 +87,16 @@ impl From<&str> for Line {
                         Line::KeyVal(key, val)
                     }
                     Some(a) => {
-                        let val: String = chars
-                            .take_while(|x| x != &HASH)
-                            .map(Self::escape_lf)
-                            .collect();
+                        let mut val = Self::escape_lf(a);
 
-                        Line::KeyVal(
-                            key,
-                            format!("{}{}", Self::escape_lf(a), val).trim().to_string(),
-                        )
+                        val.push_str(
+                            &chars
+                                .take_while(|x| x != &HASH)
+                                .map(Self::escape_lf)
+                                .collect::<String>(),
+                        );
+
+                        Line::KeyVal(key, val.trim().to_string())
                     }
                     _ => Line::KeyVal(key, String::new()),
                 }
