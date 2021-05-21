@@ -88,7 +88,7 @@ fn escaped_newlines_dquote() {
         res,
         Line::KeyVal(
             "ESCAPED_NEWLINES_DQUOTE".to_string(),
-            r#"escaped\\nnew\\nlines"#.to_string()
+            "escaped\\nnew\\nlines".to_string()
         )
     )
 }

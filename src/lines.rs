@@ -19,10 +19,15 @@ impl Line {
 
         loop {
             match chars.next() {
-                // If escape char is found
+                // If \ is found
                 Some(x) if x == B_SLASH => match chars.next() {
-                    Some(n) if n == 'n' => {
+                    // "\n" -> Chars: ['\\', 'n']
+                    Some('n') => {
                         s.push(LF);
+                    }
+                    // "\\n" -> Chars: ['\\', '\\', 'n']
+                    Some(B_SLASH) => {
+                        s.push(B_SLASH);
                     }
                     Some(n) => {
                         s.push(x);
