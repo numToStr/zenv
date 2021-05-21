@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 
-const B_SLASH: char = '\\';
-const NLINE: char = '\n';
-const QUOTE: char = '\'';
-const D_QUOTE: char = '"';
+const LF: char = '\n';
 const HASH: char = '#';
+const B_SLASH: char = '\\';
+const S_QUOTE: char = '\'';
+const D_QUOTE: char = '"';
 
 #[derive(Debug, PartialEq)]
 pub enum Line {
@@ -22,7 +22,7 @@ impl Line {
                 // If escape char is found
                 Some(x) if x == B_SLASH => match chars.next() {
                     Some(n) if n == 'n' => {
-                        s.push(NLINE);
+                        s.push(LF);
                     }
                     Some(n) => {
                         s.push(x);
@@ -38,6 +38,14 @@ impl Line {
         }
 
         s
+    }
+
+    fn escape_lf(x: char) -> String {
+        if x == LF {
+            x.escape_debug().to_string()
+        } else {
+            x.to_string()
+        }
     }
 }
 
@@ -65,15 +73,24 @@ impl From<&str> for Line {
 
                         Line::KeyVal(key, val)
                     }
-                    Some(QUOTE) => {
-                        let val: String = chars.take_while(|x| x != &QUOTE).collect();
+                    Some(S_QUOTE) => {
+                        let val: String = chars
+                            .take_while(|x| x != &S_QUOTE)
+                            .map(Self::escape_lf)
+                            .collect();
 
                         Line::KeyVal(key, val)
                     }
                     Some(a) => {
-                        let val: String = chars.take_while(|x| x != &HASH).collect();
+                        let val: String = chars
+                            .take_while(|x| x != &HASH)
+                            .map(Self::escape_lf)
+                            .collect();
 
-                        Line::KeyVal(key, format!("{}{}", a, val).trim().to_string())
+                        Line::KeyVal(
+                            key,
+                            format!("{}{}", Self::escape_lf(a), val).trim().to_string(),
+                        )
                     }
                     _ => Line::KeyVal(key, String::new()),
                 }
