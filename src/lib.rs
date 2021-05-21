@@ -23,7 +23,7 @@ impl Zenv {
 
         let hash = match self.expand {
             true => lines.expand(),
-            false => lines.into_hash_map(),
+            false => lines.to_hash_map(),
         };
 
         Ok(hash)

@@ -120,52 +120,59 @@ impl From<String> for Lines {
 }
 
 impl Lines {
-    pub fn into_hash_map(self) -> HashMap<String, String> {
-        let lines = self.lines;
+    pub fn to_hash_map(&self) -> HashMap<String, String> {
+        let lines = &self.lines;
         let mut hash = HashMap::with_capacity(lines.len());
 
         for line in lines {
             if let Line::KeyVal(k, v) = line {
-                hash.insert(k, v);
+                hash.insert(k.into(), v.into());
             }
         }
 
         hash
     }
 
-    pub fn expand(self) -> HashMap<String, String> {
-        let mut vars = Self::into_hash_map(self);
-        let cloned = vars.clone();
+    pub fn expand(&self) -> HashMap<String, String> {
+        let mut vars = Self::to_hash_map(self);
 
-        for (k, v) in cloned {
-            let mut new_val = String::with_capacity(v.len());
-            let mut v_chars = v.chars();
+        for line in &self.lines {
+            if let Line::KeyVal(k, v) = line {
+                let mut new_val = String::with_capacity(v.len());
+                let mut v_chars = v.chars();
 
-            loop {
-                match v_chars.next() {
-                    Some('$') => {
-                        let x: String = v_chars
-                            .by_ref()
-                            .take_while(|c| c.is_alphanumeric() || c == &'_')
-                            .collect();
+                loop {
+                    match v_chars.next() {
+                        Some('$') => {
+                            let x: String = v_chars
+                                .by_ref()
+                                .take_while(|c| c.is_alphanumeric() || c == &'_')
+                                .collect();
 
-                        if let Some(found) = vars.get(&x) {
-                            new_val.push_str(found);
+                            if let Some(found) = vars.get(&x) {
+                                new_val.push_str(found);
 
-                            // Need to find the terminator charactor
-                            // Which is also consumed by the take_while() above
-                            let idx = v_chars.clone().count();
-                            if let Some(consumed) = v.chars().rev().skip(idx).take(1).next() {
-                                new_val.push(consumed);
-                            };
+                                // Need to find the terminator charactor
+                                // Which is also consumed by the take_while() above
+                                let idx = v_chars.clone().count();
+
+                                // If we reach the end of the string
+                                if idx == 0 {
+                                    continue;
+                                }
+
+                                if let Some(consumed) = v.chars().rev().skip(idx).take(1).next() {
+                                    new_val.push(consumed);
+                                };
+                            }
                         }
+                        Some(a) => new_val.push(a),
+                        _ => break,
                     }
-                    Some(a) => new_val.push(a),
-                    _ => break,
                 }
-            }
 
-            vars.insert(k.to_string(), new_val);
+                vars.insert(k.to_string(), new_val);
+            }
         }
 
         vars
