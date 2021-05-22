@@ -67,14 +67,14 @@ impl Line {
         }
     }
 
-    fn retain_quote(orgnl: String, after: String) -> String {
+    fn retain_quote(orgnl: String, after: String, q: Quote) -> (String, Quote) {
         // If both strings length matches then it is not closed
         if orgnl.len().eq(&after.len().add(1)) {
             let new_val: String = orgnl.chars().take_while(|c| c != &HASH).collect();
 
-            new_val.trim().to_string()
+            (new_val.trim().to_string(), Quote::No)
         } else {
-            after
+            (after, q)
         }
     }
 }
@@ -101,11 +101,9 @@ impl From<&str> for Line {
                             Self::replace_lf(&v)
                         };
 
-                        Line::KeyVal(KeyVal {
-                            k: key,
-                            v: Self::retain_quote(v.to_string(), val),
-                            q: Quote::Double,
-                        })
+                        let (v, q) = Self::retain_quote(v.to_string(), val, Quote::Double);
+
+                        Line::KeyVal(KeyVal { k: key, v, q })
                     }
                     Some(S_QUOTE) => {
                         let val: String = chars
@@ -113,11 +111,9 @@ impl From<&str> for Line {
                             .map(Self::escape_lf)
                             .collect();
 
-                        Line::KeyVal(KeyVal {
-                            k: key,
-                            v: Self::retain_quote(v.to_string(), val),
-                            q: Quote::Single,
-                        })
+                        let (v, q) = Self::retain_quote(v.to_string(), val, Quote::Single);
+
+                        Line::KeyVal(KeyVal { k: key, v, q })
                     }
                     Some(a) => {
                         let mut val = Self::escape_lf(a);
