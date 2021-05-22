@@ -157,31 +157,48 @@ impl Lines {
         for line in &self.lines {
             if let Line::KeyVal(k, v) = line {
                 let mut new_val = String::with_capacity(v.len());
-                let mut v_chars = v.chars();
+                let mut chars = v.chars();
 
                 loop {
-                    match v_chars.next() {
+                    match chars.next() {
                         Some('$') => {
-                            let x: String = v_chars
-                                .by_ref()
-                                .take_while(|c| c.is_alphanumeric() || c == &'_')
-                                .collect();
+                            let (key, is_consumed): (String, bool) = match chars.next() {
+                                Some('{') => {
+                                    (chars.by_ref().take_while(|c| c != &'}').collect(), false)
+                                }
+                                Some(x) => {
+                                    let key: String = chars
+                                        .by_ref()
+                                        .take_while(|c| c.is_alphanumeric() || c == &'_')
+                                        .collect();
 
-                            if let Some(found) = vars.get(&x) {
+                                    let mut x = x.to_string();
+
+                                    x.push_str(&key);
+
+                                    (x, true)
+                                }
+                                _ => (String::new(), false),
+                            };
+
+                            if let Some(found) = vars.get(&key) {
                                 new_val.push_str(found);
 
-                                // Need to find the terminator charactor
-                                // Which is also consumed by the take_while() above
-                                let idx = v_chars.clone().count();
+                                if is_consumed {
+                                    // Need to find the terminator charactor
+                                    // Which is also consumed by the take_while() above
+                                    let idx = chars.clone().count();
 
-                                // If we reach the end of the string
-                                if idx == 0 {
-                                    continue;
+                                    // If we reach the end of the string
+                                    if idx == 0 {
+                                        continue;
+                                    }
+
+                                    if let Some(consumed) = v.chars().rev().skip(idx).take(1).next()
+                                    {
+                                        new_val.push(consumed);
+                                    };
                                 }
-
-                                if let Some(consumed) = v.chars().rev().skip(idx).take(1).next() {
-                                    new_val.push(consumed);
-                                };
                             }
                         }
                         Some(a) => new_val.push(a),

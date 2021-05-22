@@ -23,4 +23,10 @@ fn zenv_expanded() {
     assert_eq!(z.get("BASIC").unwrap(), "basic");
     assert_eq!(z.get("EXPANDED").unwrap(), "basic-expanded");
     assert_eq!(z.get("DOUBLE_EXPANDED").unwrap(), "basic-basic-expanded");
+
+    assert_eq!(z.get("EXPANDED_NEW").unwrap(), "basic_expanded");
+    assert_eq!(
+        z.get("DOUBLE_EXPANDED_NEW").unwrap(),
+        "basic_basic-basic-expanded"
+    );
 }
