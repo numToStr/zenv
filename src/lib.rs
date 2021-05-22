@@ -1,8 +1,9 @@
-mod lines;
+mod parser;
+
 use std::{collections::HashMap, fs::read_to_string, io::Result, path::PathBuf};
 
 // Just re-exporting to use as a standalone parser
-pub use lines::{KeyVal, Line, Lines};
+pub use parser::{KeyVal, Line, Lines, Quote};
 
 #[derive(Debug)]
 pub struct Zenv {
