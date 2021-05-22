@@ -7,8 +7,22 @@ const S_QUOTE: char = '\'';
 const D_QUOTE: char = '"';
 
 #[derive(Debug, PartialEq)]
+pub enum Quote {
+    Single,
+    Double,
+    No,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct KeyVal {
+    pub k: String,
+    pub v: String,
+    pub q: Quote,
+}
+
+#[derive(Debug, PartialEq)]
 pub enum Line {
-    KeyVal(String, String),
+    KeyVal(KeyVal),
     Empty,
 }
 
@@ -87,7 +101,11 @@ impl From<&str> for Line {
                             Self::replace_lf(&v)
                         };
 
-                        Line::KeyVal(key, Self::retain_quote(v.to_string(), val))
+                        Line::KeyVal(KeyVal {
+                            k: key,
+                            v: Self::retain_quote(v.to_string(), val),
+                            q: Quote::Double,
+                        })
                     }
                     Some(S_QUOTE) => {
                         let val: String = chars
@@ -95,7 +113,11 @@ impl From<&str> for Line {
                             .map(Self::escape_lf)
                             .collect();
 
-                        Line::KeyVal(key, Self::retain_quote(v.to_string(), val))
+                        Line::KeyVal(KeyVal {
+                            k: key,
+                            v: Self::retain_quote(v.to_string(), val),
+                            q: Quote::Single,
+                        })
                     }
                     Some(a) => {
                         let mut val = Self::escape_lf(a);
@@ -107,9 +129,17 @@ impl From<&str> for Line {
                                 .collect::<String>(),
                         );
 
-                        Line::KeyVal(key, val.trim().to_string())
+                        Line::KeyVal(KeyVal {
+                            k: key,
+                            v: val.trim().to_string(),
+                            q: Quote::No,
+                        })
                     }
-                    _ => Line::KeyVal(key, String::new()),
+                    _ => Line::KeyVal(KeyVal {
+                        k: key,
+                        v: String::with_capacity(0),
+                        q: Quote::No,
+                    }),
                 }
             }
             _ => Self::Empty,
@@ -143,7 +173,7 @@ impl Lines {
         let mut hash = HashMap::with_capacity(lines.len());
 
         for line in lines {
-            if let Line::KeyVal(k, v) = line {
+            if let Line::KeyVal(KeyVal { k, v, .. }) = line {
                 hash.insert(k.into(), v.into());
             }
         }
@@ -155,7 +185,7 @@ impl Lines {
         let mut vars = Self::to_hash_map(self);
 
         for line in &self.lines {
-            if let Line::KeyVal(k, v) = line {
+            if let Line::KeyVal(KeyVal { k, v, .. }) = line {
                 let mut new_val = String::with_capacity(v.len());
                 let mut chars = v.chars();
 
