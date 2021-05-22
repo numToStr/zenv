@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, ops::Add};
 
 const LF: char = '\n';
 const HASH: char = '#';
@@ -52,6 +52,17 @@ impl Line {
             x.to_string()
         }
     }
+
+    fn retain_quote(orgnl: String, after: String) -> String {
+        // If both strings length matches then it is not closed
+        if orgnl.len().eq(&after.len().add(1)) {
+            let new_val: String = orgnl.chars().take_while(|c| c != &HASH).collect();
+
+            new_val.trim().to_string()
+        } else {
+            after
+        }
+    }
 }
 
 impl From<&str> for Line {
@@ -76,7 +87,7 @@ impl From<&str> for Line {
                             Self::replace_lf(&v)
                         };
 
-                        Line::KeyVal(key, val)
+                        Line::KeyVal(key, Self::retain_quote(v.to_string(), val))
                     }
                     Some(S_QUOTE) => {
                         let val: String = chars
@@ -84,7 +95,7 @@ impl From<&str> for Line {
                             .map(Self::escape_lf)
                             .collect();
 
-                        Line::KeyVal(key, val)
+                        Line::KeyVal(key, Self::retain_quote(v.to_string(), val))
                     }
                     Some(a) => {
                         let mut val = Self::escape_lf(a);

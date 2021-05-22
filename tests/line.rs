@@ -169,6 +169,19 @@ fn retain_leading_dquote() {
 }
 
 #[test]
+fn retain_leading_dquote_with_comment() {
+    let res = Line::from("RETAIN_LEADING_DQUOTE_COMMENT=\"retained_dquote comment # comment");
+
+    assert_eq!(
+        res,
+        Line::KeyVal(
+            "RETAIN_LEADING_DQUOTE_COMMENT".to_string(),
+            "\"retained_dquote comment".to_string()
+        )
+    )
+}
+
+#[test]
 fn retain_leading_squote() {
     let res = Line::from("RETAIN_LEADING_SQUOTE='retained_squote");
 
@@ -177,6 +190,19 @@ fn retain_leading_squote() {
         Line::KeyVal(
             "RETAIN_LEADING_SQUOTE".to_string(),
             "'retained_squote".to_string()
+        )
+    )
+}
+
+#[test]
+fn retain_leading_squote_with_comment() {
+    let res = Line::from("RETAIN_LEADING_SQUOTE_COMMENT='retained_squote comment # comment");
+
+    assert_eq!(
+        res,
+        Line::KeyVal(
+            "RETAIN_LEADING_SQUOTE_COMMENT".to_string(),
+            "'retained_squote comment".to_string()
         )
     )
 }
