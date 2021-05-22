@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use super::line::{KeyVal, Line};
+use super::line::{KeyVal, Line, Quote};
 
 #[derive(Debug)]
 pub struct Lines {
@@ -40,7 +40,12 @@ impl Lines {
         let mut vars = Self::to_hash_map(self);
 
         for line in &self.lines {
-            if let Line::KeyVal(KeyVal { k, v, .. }) = line {
+            if let Line::KeyVal(KeyVal {
+                q: Quote::Double,
+                k,
+                v,
+            }) = line
+            {
                 let mut new_val = String::with_capacity(v.len());
                 let mut chars = v.chars();
 
