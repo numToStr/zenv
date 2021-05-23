@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, env};
 
 use super::line::{KeyVal, Line, Quote};
 
@@ -66,27 +66,29 @@ impl Lines {
 
                                     (x, true)
                                 }
-                                _ => (String::new(), false),
+                                _ => (String::with_capacity(0), false),
                             };
 
-                            if let Some(found) = vars.get(&key) {
-                                new_val.push_str(found);
+                            let found = match vars.get(&key) {
+                                Some(x) => x.to_string(),
+                                _ => env::var(&key).unwrap_or_default(),
+                            };
 
-                                if is_consumed {
-                                    // Need to find the terminator charactor
-                                    // Which is also consumed by the take_while() above
-                                    let idx = chars.clone().count();
+                            new_val.push_str(&found);
 
-                                    // If we reach the end of the string
-                                    if idx == 0 {
-                                        continue;
-                                    }
+                            if is_consumed {
+                                // Need to find the terminator charactor
+                                // Which is also consumed by the take_while() above
+                                let idx = chars.clone().count();
 
-                                    if let Some(consumed) = v.chars().rev().skip(idx).take(1).next()
-                                    {
-                                        new_val.push(consumed);
-                                    };
+                                // If we reach the end of the string
+                                if idx == 0 {
+                                    continue;
                                 }
+
+                                if let Some(consumed) = v.chars().rev().skip(idx).take(1).next() {
+                                    new_val.push(consumed);
+                                };
                             }
                         }
                         Some(a) => new_val.push(a),
