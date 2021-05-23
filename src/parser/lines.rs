@@ -4,17 +4,17 @@ use super::line::{KeyVal, Line, Quote};
 
 #[derive(Debug)]
 pub struct Lines {
-    lines: Vec<Line>,
+    lines: Vec<KeyVal>,
 }
 
 impl From<String> for Lines {
     fn from(lines: String) -> Self {
-        let lines: Vec<Line> = lines
+        let lines: Vec<KeyVal> = lines
             .lines()
             .into_iter()
             .filter_map(|x| match Line::from(x) {
-                Line::Empty => None,
-                x => Some(x),
+                Line::KeyVal(x) => Some(x),
+                _ => None,
             })
             .collect();
 
@@ -28,9 +28,7 @@ impl Lines {
         let mut hash = HashMap::with_capacity(lines.len());
 
         for line in lines {
-            if let Line::KeyVal(KeyVal { k, v, .. }) = line {
-                hash.insert(k.into(), v.into());
-            }
+            hash.insert(line.k.to_string(), line.v.to_string());
         }
 
         hash
@@ -40,11 +38,11 @@ impl Lines {
         let mut vars = Self::to_hash_map(self);
 
         for line in &self.lines {
-            if let Line::KeyVal(KeyVal {
+            if let KeyVal {
                 q: Quote::Double,
                 k,
                 v,
-            }) = line
+            } = line
             {
                 let mut new_val = String::with_capacity(v.len());
                 let mut chars = v.chars();
