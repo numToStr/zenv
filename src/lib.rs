@@ -1,6 +1,11 @@
 mod parser;
 
-use std::{collections::HashMap, fs::read_to_string, io::Result, path::PathBuf};
+use std::{
+    collections::HashMap,
+    fs::read_to_string,
+    io::{Error, ErrorKind, Result},
+    path::PathBuf,
+};
 
 // Just re-exporting to use as a standalone parser
 pub use parser::{KeyVal, Line, Lines, Quote};
@@ -20,6 +25,15 @@ impl Zenv {
     }
 
     pub fn parse(&self) -> Result<HashMap<String, String>> {
+        let path = &self.path;
+
+        if !path.exists() {
+            return Err(Error::new(
+                ErrorKind::NotFound,
+                format!("Unable to find file - {}", path.display()),
+            ));
+        }
+
         let lines = {
             let r = read_to_string(&self.path)?;
             Lines::from(r)
