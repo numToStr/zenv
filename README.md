@@ -3,7 +3,11 @@
 </h1>
 <p align="center">Dotenv (.env) loader written in rust 🦀</p>
 
-<!-- TODO: badges -->
+<p align="center">
+[![build](https://github.com/numToStr/zenv/actions/workflows/build.yml/badge.svg)](https://github.com/numToStr/zenv/actions/workflows/build.yml)
+[![docs](https://docs.rs/zenv/badge.svg)](https://docs.rs/zenv)
+[![crates.io](https://img.shields.io/crates/v/zenv.svg)](https://crates.io/crates/zenv)
+</p>
 
 ## ✨ Features
 
@@ -13,11 +17,11 @@
 
 ## 🚀 Installation
 
-#### Crate
+### Crate
 
 Add `zenv` with a version of your choice in the `Cargo.toml`
 
-#### CLI
+### CLI
 
 -   **Using `cargo`**
 
@@ -31,7 +35,7 @@ Check out the [Release page](https://github.com/numToStr/zenv/releases) for preb
 
 ## 🤞 Usage
 
-#### Crate
+### Crate
 
 ```rust
 use zenv::Zenv;
@@ -44,7 +48,7 @@ fn main() {
 
 Read full [documention](https:://docs.rs/zenv)
 
-#### CLI
+### CLI
 
 ```
 zenv
