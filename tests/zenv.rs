@@ -1,12 +1,8 @@
-use std::path::PathBuf;
-
 use zenv::Zenv;
 
 #[test]
 fn zenv_basic() {
-    let z = Zenv::new(PathBuf::from("tests/.env.basic"), false)
-        .parse()
-        .unwrap();
+    let z = Zenv::new("tests/.env.basic", false).parse().unwrap();
 
     assert_eq!(z.get("BASIC").unwrap(), "basic");
     assert_eq!(z.get("EMPTY").unwrap(), "");
@@ -16,9 +12,7 @@ fn zenv_basic() {
 
 #[test]
 fn zenv_expanded() {
-    let z = Zenv::new(PathBuf::from("tests/.env.expanded"), true)
-        .parse()
-        .unwrap();
+    let z = Zenv::new("tests/.env.expanded", true).parse().unwrap();
 
     assert_eq!(z.get("BASIC").unwrap(), "basic");
 
