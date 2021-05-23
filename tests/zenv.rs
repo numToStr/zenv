@@ -39,4 +39,7 @@ fn zenv_expanded() {
         z.get("NO_DOUBLE_EXPANDED_NEW").unwrap(),
         "${BASIC}_${DOUBLE_EXPANDED}"
     );
+
+    assert_eq!(z.get("NO_SYSTEM_VAR").unwrap(), "_dont_exist");
+    assert_ne!(z.get("SYSTEM_VAR").unwrap(), "_exist");
 }
