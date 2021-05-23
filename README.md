@@ -44,15 +44,16 @@ Check out the [Release page](https://github.com/numToStr/zenv/releases) for preb
 ### Crate
 
 ```rust
-use zenv::Zenv;
-use std::path::PathBuf;
-
 fn main() {
-    Zenv::new(PathBuf::new(".env"), true).configure().ok();
+    zenv::Zenv::new(".env", false).configure().ok();
+
+    // or use macro, which expands to above statement
+
+    zenv::zenv!()
 }
 ```
 
-Read full [documention](https:://docs.rs/zenv)
+> Read the full [documention](https:://docs.rs/zenv)
 
 ### CLI
 
