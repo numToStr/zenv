@@ -57,3 +57,16 @@ impl Zenv {
         Ok(())
     }
 }
+
+#[macro_export]
+macro_rules! zenv {
+    () => {
+        zenv::Zenv::new(".env", false).configure().ok()
+    };
+    ($path:expr) => {
+        zenv::Zenv::new($path, false).configure().ok()
+    };
+    ($path:expr, $expand:expr) => {
+        zenv::Zenv::new($path, $expand).configure().ok()
+    };
+}

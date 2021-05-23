@@ -1,4 +1,4 @@
-use zenv::Zenv;
+use zenv::{zenv, Zenv};
 
 #[test]
 fn zenv_basic() {
@@ -36,4 +36,27 @@ fn zenv_expanded() {
 
     assert_eq!(z.get("NO_SYSTEM_VAR").unwrap(), "_dont_exist");
     assert_ne!(z.get("SYSTEM_VAR").unwrap(), "_exist");
+}
+
+#[test]
+fn zenv_macro_basic() {
+    use std::env::var_os;
+
+    zenv!("tests/.env.basic");
+
+    assert_eq!(var_os("BASIC").unwrap(), "basic");
+    assert_eq!(var_os("EMPTY").unwrap(), "");
+    assert_eq!(var_os("SINGLE_QUOTES").unwrap(), "single_quotes");
+    assert_eq!(var_os("DOUBLE_QUOTES").unwrap(), "double_quotes");
+}
+
+#[test]
+fn zenv_macro_expanded() {
+    use std::env::var_os;
+
+    zenv!("tests/.env.expanded", true);
+
+    assert_eq!(var_os("BASIC").unwrap(), "basic");
+    assert_eq!(var_os("EXPANDED").unwrap(), "basic-expanded");
+    assert_eq!(var_os("DOUBLE_EXPANDED").unwrap(), "basic-basic-expanded");
 }
