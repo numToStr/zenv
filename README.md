@@ -1,7 +1,7 @@
 <h1 align="center">
     <code>.zenv</code>
 </h1>
-<p align="center">Dotenv (.env) loader written in rust 🦀</p>
+<p align="center"><b>Dotenv (.env) loader written in rust 🦀</b></p>
 
 <p align="center">
   <a aria-label="build" href="https://github.com/numToStr/zenv/actions/workflows/build.yml">
