@@ -3,9 +3,17 @@
 </h1>
 <p align="center">Dotenv (.env) loader written in rust 🦀</p>
 
-[![build](https://github.com/numToStr/zenv/actions/workflows/build.yml/badge.svg)](https://github.com/numToStr/zenv/actions/workflows/build.yml)
-[![docs](https://docs.rs/zenv/badge.svg)](https://docs.rs/zenv)
-[![crates.io](https://img.shields.io/crates/v/zenv.svg)](https://crates.io/crates/zenv)
+<p align="center">
+  <a aria-label="build" href="https://github.com/numToStr/zenv/actions/workflows/build.yml">
+    <img alt="build" src="https://github.com/numToStr/zenv/actions/workflows/build.yml/badge.svg">
+  </a>
+  <a aria-label="docs" href="https://docs.rs/zenv">
+    <img alt="docs" src="https://docs.rs/zenv/badge.svg">
+  </a>
+  <a aria-label="crates.io" href="https://crates.io/crates/zenv">
+    <img alt="crates.io" src="https://img.shields.io/crates/v/zenv.svg">
+  </a>
+</p>
 
 ## ✨ Features
 
