@@ -35,7 +35,7 @@ impl Zenv {
         }
 
         let lines = {
-            let r = read_to_string(&self.path)?;
+            let r = read_to_string(path)?;
             Lines::from(r)
         };
 
