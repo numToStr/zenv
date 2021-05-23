@@ -12,8 +12,11 @@ pub struct Zenv {
 }
 
 impl Zenv {
-    pub fn new(path: PathBuf, expand: bool) -> Self {
-        Self { path, expand }
+    pub fn new(path: &str, expand: bool) -> Self {
+        Self {
+            path: PathBuf::from(path),
+            expand,
+        }
     }
 
     pub fn parse(&self) -> Result<HashMap<String, String>> {
