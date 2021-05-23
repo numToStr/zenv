@@ -1,5 +1,4 @@
 use std::ffi::OsString;
-use std::path::PathBuf;
 
 use pico_args::Arguments;
 
@@ -15,7 +14,7 @@ pub struct Cli {
     pub expand: bool,
 
     // Path to .env file
-    path: Option<PathBuf>,
+    path: Option<String>,
 
     // Name of the command
     binary: Option<OsString>,
@@ -64,13 +63,14 @@ impl Cli {
         Ok(res)
     }
 
-    pub fn path(&self) -> Result<&PathBuf, String> {
-        let p = self.path.as_ref().ok_or("-f/--file option is required")?;
+    pub fn path(&self) -> Result<String, String> {
+        let path = self
+            .path
+            .as_ref()
+            .ok_or("-f/--file option is required")?
+            .to_string();
 
-        match p.exists() {
-            true => Ok(p),
-            false => Err(format!("Unable to find file - `{}`", p.display())),
-        }
+        Ok(path)
     }
 
     pub fn binary(&self) -> Result<&OsString, &str> {

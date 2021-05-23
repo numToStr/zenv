@@ -1,6 +1,11 @@
 mod parser;
 
-use std::{collections::HashMap, fs::read_to_string, io::Result, path::PathBuf};
+use std::{
+    collections::HashMap,
+    fs::read_to_string,
+    io::{Error, ErrorKind, Result},
+    path::PathBuf,
+};
 
 // Just re-exporting to use as a standalone parser
 pub use parser::{KeyVal, Line, Lines, Quote};
@@ -12,13 +17,25 @@ pub struct Zenv {
 }
 
 impl Zenv {
-    pub fn new(path: PathBuf, expand: bool) -> Self {
-        Self { path, expand }
+    pub fn new(path: &str, expand: bool) -> Self {
+        Self {
+            path: PathBuf::from(path),
+            expand,
+        }
     }
 
     pub fn parse(&self) -> Result<HashMap<String, String>> {
+        let path = &self.path;
+
+        if !path.exists() {
+            return Err(Error::new(
+                ErrorKind::NotFound,
+                format!("Unable to find file - {}", path.display()),
+            ));
+        }
+
         let lines = {
-            let r = read_to_string(&self.path)?;
+            let r = read_to_string(path)?;
             Lines::from(r)
         };
 
@@ -39,4 +56,17 @@ impl Zenv {
 
         Ok(())
     }
+}
+
+#[macro_export]
+macro_rules! zenv {
+    () => {
+        zenv::Zenv::new(".env", false).configure().ok()
+    };
+    ($path:expr) => {
+        zenv::Zenv::new($path, false).configure().ok()
+    };
+    ($path:expr, $expand:expr) => {
+        zenv::Zenv::new($path, $expand).configure().ok()
+    };
 }
