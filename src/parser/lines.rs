@@ -60,11 +60,9 @@ impl Lines {
                                         .take_while(|c| c.is_alphanumeric() || c == &'_')
                                         .collect();
 
-                                    let mut x = x.to_string();
+                                    let k = x.to_string() + &key;
 
-                                    x.push_str(&key);
-
-                                    (x, true)
+                                    (k, true)
                                 }
                                 _ => (String::with_capacity(0), false),
                             };
