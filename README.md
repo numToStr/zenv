@@ -29,7 +29,7 @@ Add [`zenv`](https://crates.io/crates/zenv) with a version of your choice in the
 
 ```toml
 [dependencies]
-zenv = "0.6.0" # Make sure it's the latest version
+zenv = "<version>" # Make sure it's the latest version
 ```
 
 ### CLI
