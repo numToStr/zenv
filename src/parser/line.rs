@@ -6,23 +6,62 @@ const B_SLASH: char = '\\';
 const S_QUOTE: char = '\'';
 const D_QUOTE: char = '"';
 
+/// Type of the quote
 #[derive(Debug, PartialEq)]
 pub enum Quote {
+    /// When the value is single quoted i.e. `'`
     Single,
+
+    /// When the value is double quoted i.e. `"`
     Double,
+
+    /// When the value is not quoted
     No,
 }
 
+/// To collect the info about the current line
 #[derive(Debug, PartialEq)]
 pub struct KeyVal {
+    /// `key` of the variable
     pub k: String,
+
+    /// `value` of the variable
     pub v: String,
+
+    /// Whether the value is quoted or not
     pub q: Quote,
 }
 
+/// (Can be) Used to parse the current line
+///
+/// Example
+/// ```
+/// use zenv::{Line, KeyVal, Quote};
+///
+/// let line = Line::from("BASIC=basic");
+///
+/// let k = "BASIC".to_string();
+/// let v = "basic".to_string();
+/// assert_eq!(line, Line::KeyVal(KeyVal { k, v, q: Quote::No }));
+///
+/// // Commented line
+/// let empty = Line::from("# COMMENT=commented");
+///
+/// assert_eq!(empty, Line::Empty);
+///
+/// // With quotes
+/// let quoted = Line::from("S_QUOTED='single_quoted'");
+///
+/// let k = "S_QUOTED".to_string();
+/// let v = "single_quoted".to_string();
+/// assert_eq!(quoted, Line::KeyVal(KeyVal { k, v, q: Quote::Single }));
+/// ```
 #[derive(Debug, PartialEq)]
 pub enum Line {
+    /// When the current line is a `key=val` pair
     KeyVal(KeyVal),
+
+    /// When the current line is empty
     Empty,
 }
 
