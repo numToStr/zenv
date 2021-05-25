@@ -149,6 +149,6 @@ SYSTEM_VARIABLE="${PATH},/this/is/new/path"
 
 ## 🙏 Credits
 
--   [motdotla/dotenv](https://github.com/motdotla/dotenv) for Javascript
--   [joho/godotenv](https://github.com/joho/godotenv) for Go
--   [bkeepers/dotenv](https://github.com/bkeepers/dotenv) for Ruby
+-   [motdotla/dotenv](https://github.com/motdotla/dotenv) (Javascript)
+-   [joho/godotenv](https://github.com/joho/godotenv) (Golang)
+-   [bkeepers/dotenv](https://github.com/bkeepers/dotenv) (Ruby)
