@@ -1,3 +1,27 @@
+//! Zenv is a dotenv loader which parses and loads your environment variables from a `.env` file.
+//!
+//! This crate also supports variable substitution inside your .env file, if not found then
+//! tries to fetch from the running operating system. By default, this is disabled.
+//!
+//! _This crate only meant to use inside a development environment._
+//!
+//! Example
+//! ```
+//! use zenv::{zenv, Zenv};
+//!
+//! fn main() {
+//!     Zenv::new(".env", false).configure().ok();
+//!     // is equivalent to
+//!     zenv!();
+//!
+//!     // with other file
+//!     zenv!(".env.development");
+//!
+//!     // or with variable substitution
+//!     zenv!(".env.development", true);
+//! }
+//! ```
+
 mod parser;
 
 use std::{
@@ -10,6 +34,7 @@ use std::{
 // Just re-exporting to use as a standalone parser
 pub use parser::{KeyVal, Line, Lines, Quote};
 
+/// Use this to load and configure the environment variables
 #[derive(Debug)]
 pub struct Zenv {
     path: PathBuf,
@@ -17,6 +42,7 @@ pub struct Zenv {
 }
 
 impl Zenv {
+    /// Create a new instance of Zenv with the provided file path
     pub fn new(path: &str, expand: bool) -> Self {
         Self {
             path: PathBuf::from(path),
@@ -24,6 +50,14 @@ impl Zenv {
         }
     }
 
+    /// Read and parse the file from provided path and returns a hashmap
+    ///
+    /// Example
+    /// ```
+    /// let parsed = zenv::Zenv::new(".env", false).parse().unwrap();
+    ///
+    /// assert_eq!(parsed.get("BASIC"), Some(&"basic".to_string()))
+    /// ```
     pub fn parse(&self) -> Result<HashMap<String, String>> {
         let path = &self.path;
 
@@ -47,6 +81,14 @@ impl Zenv {
         Ok(hash)
     }
 
+    /// Parse the file using [Zenv::parse] and sets the environment variable
+    ///
+    /// Example
+    /// ```
+    /// zenv::Zenv::new(".env", false).configure().ok();
+    ///
+    /// assert_eq!(std::env::var_os("BASIC"), Some("basic".into()))
+    /// ```
     pub fn configure(&self) -> Result<()> {
         let vars = self.parse()?;
 
@@ -58,6 +100,20 @@ impl Zenv {
     }
 }
 
+/// This macro can be used as a shortcut for [Zenv]
+///
+/// Example
+/// ```
+/// use zenv::zenv;
+///
+/// zenv!();
+///
+/// // with other file
+/// zenv!(".env.development");
+///
+/// // or with variable substitution
+/// zenv!(".env.development", true);
+/// ````
 #[macro_export]
 macro_rules! zenv {
     () => {
