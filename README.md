@@ -36,7 +36,7 @@ zenv = "<version>" # Make sure it's the latest version
 
 -   **Using `cargo`**
 
-```sh
+```bash
 cargo install zenv --features=cli
 ```
 
