@@ -2,6 +2,9 @@ use std::{collections::HashMap, env};
 
 use super::line::{KeyVal, Line, Quote};
 
+/// `Lines` is used to parse the sequence of lines
+///
+/// [`Zenv`](crate::Zenv) is built on top it. And if you want you can directly use this but don't :)
 #[derive(Debug)]
 pub struct Lines {
     lines: Vec<KeyVal>,
@@ -23,6 +26,22 @@ impl From<&str> for Lines {
 }
 
 impl Lines {
+    /// Parses the lines and converts into a hashmap
+    ///
+    /// Example
+    /// ```
+    /// use zenv::Lines;
+    ///
+    /// const LINES: &str = r#"
+    /// BASIC=basic
+    /// QUOTED='quoted'
+    /// "#;
+    ///
+    /// let parsed = Lines::from(LINES).to_hash_map();
+    ///
+    /// assert_eq!(parsed.get("BASIC").unwrap(), &"basic".to_string());
+    /// assert_eq!(parsed.get("QUOTED").unwrap(), &"quoted".to_string());
+    /// ```
     pub fn to_hash_map(&self) -> HashMap<String, String> {
         let lines = &self.lines;
         let mut hash = HashMap::with_capacity(lines.len());
@@ -34,6 +53,22 @@ impl Lines {
         hash
     }
 
+    /// Parses the lines and does variable substitution then converts into a hashmap
+    ///
+    /// Example
+    /// ```
+    /// use zenv::Lines;
+    ///
+    /// const LINES: &str = r#"
+    /// BASIC=basic
+    /// EXPANDED="${BASIC}_is_expanded"
+    /// "#;
+    ///
+    /// let parsed = Lines::from(LINES).expand();
+    ///
+    /// assert_eq!(parsed.get("BASIC").unwrap(), &"basic".to_string());
+    /// assert_eq!(parsed.get("EXPANDED").unwrap(), &"basic_is_expanded".to_string());
+    /// ```
     pub fn expand(&self) -> HashMap<String, String> {
         let mut vars = Self::to_hash_map(self);
 
