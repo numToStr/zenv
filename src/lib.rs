@@ -100,7 +100,7 @@ impl Zenv {
     }
 }
 
-/// This macro can be used as a shortcut for [Zenv]
+/// This macro can be used as a shortcut for [`Zenv`]
 ///
 /// Example
 /// ```
