@@ -87,7 +87,7 @@ Examples:
     zenv -f .env -- terraform apply
 ```
 
-## Good to Know
+## 🙌 Good to Know
 
 ### Basic
 
