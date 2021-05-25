@@ -11,6 +11,20 @@ pub struct Lines {
 }
 
 impl From<&str> for Lines {
+    /// From `&str` to [`Lines`]
+    ///
+    /// Example
+    /// ```
+    /// use zenv::Lines;
+    ///
+    /// const LINES: &str = r#"
+    /// BASIC=basic
+    /// "#;
+    ///
+    /// let parsed = Lines::from(LINES).to_hash_map();
+    ///
+    /// assert_eq!(parsed.get("BASIC").unwrap(), &"basic".to_string());
+    /// ```
     fn from(lines: &str) -> Self {
         let lines: Vec<KeyVal> = lines
             .lines()
@@ -26,6 +40,22 @@ impl From<&str> for Lines {
 }
 
 impl Lines {
+    /// To be able to parse `Vec<`[`Line`](crate::Line)`>`
+    ///
+    /// Example
+    /// ```
+    /// use zenv::{Line, Lines};
+    ///
+    /// let lines: Vec<Line> = Vec::from([
+    ///     Line::from("PORT=5000"),
+    ///     Line::from("BASIC=basic"),
+    /// ]);
+    ///
+    /// let parsed = Lines::new(lines).to_hash_map();
+    ///
+    /// assert_eq!(parsed.get("PORT").unwrap(), &"5000".to_string());
+    /// assert_eq!(parsed.get("BASIC").unwrap(), &"basic".to_string());
+    /// ```
     pub fn new(lines: Vec<Line>) -> Self {
         let lines = lines
             .into_iter()
