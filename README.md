@@ -87,7 +87,65 @@ Examples:
     zenv -f .env -- terraform apply
 ```
 
-<!-- TODO: explanation -->
+## Good to Know
+
+### Basic
+
+```bash
+PORT=5000
+NODE_ENV=production
+
+# Single and double quotes are also supported
+S_QUOTE='single_quoted'
+D_QUOTE='double_quoted'
+```
+
+### Comments
+
+Comments can be added by using `#` character.
+
+```bash
+# COMMENTED=commented
+AT_THE_END=comment_at_the_end # I am here
+
+# If you want # in you value then wrap the value in single or double quotes
+QUOTED="quote_#_quoted" # I'll be removed
+```
+
+### New Line and Escaping
+
+New lines can added by new line (`\n`) character and this only works if the values is surrounded by double quotes.
+
+```bash
+PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\nadflhsdlfsjkldfjklsdjf\n-----END RSA PRIVATE KEY-----"
+
+# or like this
+PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----
+adflhsdlfsjkldfjklsdjf
+asdffwejdjf983283lk
+-----END RSA PRIVATE KEY-----"
+```
+
+If you want to escape the new line character you can use the escape (`\`)
+
+```
+ESCAPED="escaped\\nnew\\nline"
+```
+
+### Substitution
+
+`Zenv` also supports variable substitution (off by default) from the current file or from the operating system. Substitution only works if the values is double quoted ie.e `"` and can be achieved by the following:
+
+-   Using `${VAR}` pattern (recommended)
+-   Starting the variable name by `$` character, which terminates after reaching a character which is not `_` or alphanumeric.
+
+```bash
+BASIC=basic
+EXPANDED='${BASIC}_expanded' # expands to 'basic_expanded'
+
+# System variables (assuming `PATH` is available)
+SYSTEM_VARIABLE="${PATH},/this/is/new/path"
+```
 
 ## 🙏 Credits
 
