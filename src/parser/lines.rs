@@ -7,8 +7,8 @@ pub struct Lines {
     lines: Vec<KeyVal>,
 }
 
-impl From<String> for Lines {
-    fn from(lines: String) -> Self {
+impl From<&str> for Lines {
+    fn from(lines: &str) -> Self {
         let lines: Vec<KeyVal> = lines
             .lines()
             .into_iter()
