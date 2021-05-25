@@ -54,7 +54,7 @@ impl Zenv {
     ///
     /// Example
     /// ```
-    /// let parsed = zenv::Zenv::new(".env", false).parse().unwrap();
+    /// let parsed = zenv::Zenv::new("tests/.env.basic", false).parse().unwrap();
     ///
     /// assert_eq!(parsed.get("BASIC"), Some(&"basic".to_string()))
     /// ```
@@ -85,7 +85,7 @@ impl Zenv {
     ///
     /// Example
     /// ```
-    /// zenv::Zenv::new(".env", false).configure().ok();
+    /// zenv::Zenv::new("tests/.env.basic", false).configure().ok();
     ///
     /// assert_eq!(std::env::var_os("BASIC"), Some("basic".into()))
     /// ```
