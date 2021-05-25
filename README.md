@@ -25,7 +25,12 @@
 
 ### Crate
 
-Add `zenv` with a version of your choice in the `Cargo.toml`
+Add [`zenv`](https://crates.io/crates/zenv) with a version of your choice in the `Cargo.toml`
+
+```toml
+[dependencies]
+zenv = "0.6.0" # Make sure it's the latest version
+```
 
 ### CLI
 
