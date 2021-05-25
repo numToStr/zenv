@@ -26,6 +26,18 @@ impl From<&str> for Lines {
 }
 
 impl Lines {
+    pub fn new(lines: Vec<Line>) -> Self {
+        let lines = lines
+            .into_iter()
+            .filter_map(|x| match x {
+                Line::KeyVal(x) => Some(x),
+                _ => None,
+            })
+            .collect();
+
+        Self { lines }
+    }
+
     /// Parses the lines and converts into a hashmap
     ///
     /// Example
