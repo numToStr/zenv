@@ -8,6 +8,11 @@ homepage = "https://github.com/numToStr/zenv/"
 repository = "https://github.com/numToStr/zenv/"
 license-file = "LICENSE"
 readme = "README.md"
+exclude = [
+    "Makefile",
+    "tests/**",
+    ".github/**"
+]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [[bin]]
