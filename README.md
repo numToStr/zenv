@@ -40,6 +40,16 @@ zenv = "<version>" # Make sure it's the latest version
 cargo install zenv --features=cli
 ```
 
+-   **Arch Linux**
+
+```bash
+# Using `yay`
+yay -S zenv
+
+# Using `pamac`
+pamac build zenv
+```
+
 -   **From binaries**
 
 Check out the [Release page](https://github.com/numToStr/zenv/releases) for prebuild binaries for `zenv`, available for different operating systems.
@@ -128,7 +138,7 @@ asdffwejdjf983283lk
 
 If you want to escape the new line character you can use the escape (`\`)
 
-```
+```bash
 ESCAPED="escaped\\nnew\\nline"
 ```
 
