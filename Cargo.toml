@@ -22,7 +22,7 @@ name = "zenv"
 required-features = ["cli"]
 
 [dependencies]
-pico-args = { version = "0.4.1", optional = true }
+pico-args = { version = "0.4.2", optional = true }
 
 [features]
 cli = ["pico-args"]
