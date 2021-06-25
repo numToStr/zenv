@@ -10,7 +10,7 @@ checksum = "db8bcd96cb740d03149cbad5518db9fd87126a10ab519c011893b1754134c468"
 
 [[package]]
 name = "zenv"
-version = "0.7.0"
+version = "0.7.1"
 dependencies = [
  "pico-args",
 ]
