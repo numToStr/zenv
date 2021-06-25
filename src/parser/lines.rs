@@ -26,6 +26,35 @@ impl From<&str> for Lines {
 }
 
 impl Lines {
+    /// Create `Lines` from a vec of [`Line`]. Can be useful if you manually parsing individual lines
+    ///
+    /// Example
+    /// ```
+    /// use zenv::{Lines, Line};
+    ///
+    /// let lines = vec![
+    ///     Line::from("BASIC=basic"),
+    ///     Line::Empty,
+    ///     Line::from("QUOTED='quoted'")
+    /// ];
+    ///
+    /// let parsed = Lines::new(lines).to_hash_map();
+    ///
+    /// assert_eq!(parsed.get("BASIC").unwrap(), &"basic".to_string());
+    /// assert_eq!(parsed.get("QUOTED").unwrap(), &"quoted".to_string());
+    /// ```
+    pub fn new(lines: Vec<Line>) -> Self {
+        let lines = lines
+            .into_iter()
+            .filter_map(|x| match x {
+                Line::KeyVal(x) => Some(x),
+                _ => None,
+            })
+            .collect();
+
+        Self { lines }
+    }
+
     /// Parses the lines and converts into a hashmap
     ///
     /// Example
