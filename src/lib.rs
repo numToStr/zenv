@@ -68,10 +68,8 @@ impl Zenv {
             ));
         }
 
-        let lines = {
-            let r = read_to_string(path)?;
-            Lines::from(r.as_str())
-        };
+        let r = read_to_string(path)?;
+        let lines = Lines::from(r.as_str());
 
         let hash = match self.expand {
             true => lines.expand(),

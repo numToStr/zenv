@@ -6,12 +6,12 @@ use super::line::{KeyVal, Line, Quote};
 ///
 /// [`Zenv`](crate::Zenv) is built on top it. And if you want you can directly use this but don't :)
 #[derive(Debug)]
-pub struct Lines {
-    lines: Vec<KeyVal>,
+pub struct Lines<'l> {
+    lines: Vec<KeyVal<'l>>,
 }
 
-impl From<&str> for Lines {
-    fn from(lines: &str) -> Self {
+impl<'l> From<&'l str> for Lines<'l> {
+    fn from(lines: &'l str) -> Self {
         let lines: Vec<KeyVal> = lines
             .lines()
             .into_iter()
@@ -25,7 +25,7 @@ impl From<&str> for Lines {
     }
 }
 
-impl Lines {
+impl<'l> Lines<'l> {
     /// Create `Lines` from a vec of [`Line`]. Can be useful if you manually parsing individual lines
     ///
     /// Example
@@ -43,7 +43,7 @@ impl Lines {
     /// assert_eq!(parsed.get("BASIC").unwrap(), &"basic".to_string());
     /// assert_eq!(parsed.get("QUOTED").unwrap(), &"quoted".to_string());
     /// ```
-    pub fn new(lines: Vec<Line>) -> Self {
+    pub fn new(lines: Vec<Line<'l>>) -> Self {
         let lines = lines
             .into_iter()
             .filter_map(|x| match x {

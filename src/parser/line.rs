@@ -21,9 +21,9 @@ pub enum Quote {
 
 /// To collect the info about the current line
 #[derive(Debug, PartialEq)]
-pub struct KeyVal {
+pub struct KeyVal<'k> {
     /// `key` of the variable
-    pub k: String,
+    pub k: &'k str,
 
     /// `value` of the variable
     pub v: String,
@@ -40,7 +40,7 @@ pub struct KeyVal {
 ///
 /// let line = Line::from("BASIC=basic");
 ///
-/// let k = "BASIC".to_string();
+/// let k = "BASIC";
 /// let v = "basic".to_string();
 /// assert_eq!(line, Line::KeyVal(KeyVal { k, v, q: Quote::No }));
 ///
@@ -52,20 +52,20 @@ pub struct KeyVal {
 /// // With quotes
 /// let quoted = Line::from("S_QUOTED='single_quoted'");
 ///
-/// let k = "S_QUOTED".to_string();
+/// let k = "S_QUOTED";
 /// let v = "single_quoted".to_string();
 /// assert_eq!(quoted, Line::KeyVal(KeyVal { k, v, q: Quote::Single }));
 /// ```
 #[derive(Debug, PartialEq)]
-pub enum Line {
+pub enum Line<'l> {
     /// When the current line is a `key=val` pair
-    KeyVal(KeyVal),
+    KeyVal(KeyVal<'l>),
 
     /// When the current line is empty
     Empty,
 }
 
-impl Line {
+impl<'l> Line<'l> {
     fn replace_lf(line: &str) -> String {
         let mut s = String::with_capacity(line.len());
         let mut chars = line.chars();
@@ -118,8 +118,8 @@ impl Line {
     }
 }
 
-impl From<&str> for Line {
-    fn from(line: &str) -> Self {
+impl<'l> From<&'l str> for Line<'l> {
+    fn from(line: &'l str) -> Self {
         if line.is_empty() || line.starts_with(HASH) {
             return Self::Empty;
         };
@@ -128,7 +128,7 @@ impl From<&str> for Line {
 
         match (parts.next(), parts.next()) {
             (Some(k), Some(v)) => {
-                let key = k.trim().to_string();
+                let key = k.trim();
                 let mut chars = v.chars();
 
                 let first = chars.next();
