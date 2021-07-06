@@ -42,7 +42,7 @@ fn bootstrap() -> Result<i32, String> {
         .wait()
         .map_err(|e| e.to_string())?
         .code()
-        .ok_or_else(|| "Failed to grab the exit code".to_string())?;
+        .ok_or("Failed to grab the exit code")?;
 
     Ok(code)
 }

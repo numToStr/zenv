@@ -63,12 +63,8 @@ impl Cli {
         Ok(res)
     }
 
-    pub fn path(&self) -> Result<String, String> {
-        let path = self
-            .path
-            .as_ref()
-            .ok_or("-f/--file option is required")?
-            .to_string();
+    pub fn path(&self) -> Result<&str, &str> {
+        let path = self.path.as_ref().ok_or("-f/--file option is required")?;
 
         Ok(path)
     }
