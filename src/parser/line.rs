@@ -1,5 +1,3 @@
-use std::ops::Add;
-
 const LF: char = '\n';
 const HASH: char = '#';
 const B_SLASH: char = '\\';
@@ -106,9 +104,9 @@ impl<'l> Line<'l> {
         }
     }
 
-    fn retain_quote(orgnl: String, after: String, q: Quote) -> (String, Quote) {
+    fn retain_quote(orgnl: &str, after: String, q: Quote) -> (String, Quote) {
         // If both strings length matches then it is not closed
-        if orgnl.len().eq(&after.len().add(1)) {
+        if orgnl.len().eq(&(after.len() + 1)) {
             let new_val: String = orgnl.chars().take_while(|c| c != &HASH).collect();
 
             (new_val.trim().to_string(), Quote::No)
@@ -140,7 +138,7 @@ impl<'l> From<&'l str> for Line<'l> {
                             Self::replace_lf(&v)
                         };
 
-                        let (v, q) = Self::retain_quote(v.to_string(), val, Quote::Double);
+                        let (v, q) = Self::retain_quote(v, val, Quote::Double);
 
                         Line::KeyVal(KeyVal { k: key, v, q })
                     }
@@ -150,7 +148,7 @@ impl<'l> From<&'l str> for Line<'l> {
                             .map(Self::escape_lf)
                             .collect();
 
-                        let (v, q) = Self::retain_quote(v.to_string(), val, Quote::Single);
+                        let (v, q) = Self::retain_quote(v, val, Quote::Single);
 
                         Line::KeyVal(KeyVal { k: key, v, q })
                     }
