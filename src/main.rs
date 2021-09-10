@@ -25,7 +25,7 @@ fn bootstrap() -> Result<i32, String> {
 
     let binary = args.binary()?;
 
-    let vars = Zenv::new(&fpath, args.expand)
+    let vars = Zenv::new(fpath, args.expand)
         .parse()
         .map_err(|e| e.to_string())?;
 
