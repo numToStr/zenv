@@ -22,10 +22,10 @@ name = "zenv"
 required-features = ["cli"]
 
 [dependencies]
-pico-args = { version = "0.4.2", optional = true }
+lexopt = { version = "0.2.0", optional = true }
 
 [features]
-cli = ["pico-args"]
+cli = ["lexopt"]
 
 [profile.release]
 lto = true
