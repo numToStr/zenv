@@ -1,76 +1,53 @@
-use std::ffi::OsString;
-
-use pico_args::Arguments;
-
 use crate::info::{DESC, NAME, VERSION};
+use lexopt::{
+    Arg::{Long, Short, Value},
+    Parser,
+};
+use std::{ffi::OsString, process};
 
+#[derive(Default)]
 pub struct Cli {
-    // Print help information
-    pub help: bool,
-
-    pub version: bool,
-
     // Whether to substitute variables or not
     pub expand: bool,
-
     // Path to .env file
-    path: Option<String>,
-
+    pub path: Option<String>,
     // Name of the command
-    binary: Option<OsString>,
-
+    pub binary: Option<OsString>,
     // Arguments of the command
-    pub bin_args: Vec<OsString>,
+    pub args: Vec<OsString>,
 }
 
 impl Cli {
-    pub fn parse() -> Result<Cli, String> {
-        // `from_vec` takes `OsString`, not `String`.
-        let mut args: Vec<_> = std::env::args_os().collect();
-        args.remove(0); // remove the executable path.
+    pub fn parse() -> Result<Self, lexopt::Error> {
+        let mut cli = Self::default();
 
-        // Find and process `--`.
-        let bin_args = if let Some(dash_dash) = args.iter().position(|arg| arg == "--") {
-            // Store all arguments following ...
-            let later_args = args.drain(dash_dash + 1..).collect();
-            // .. then remove the `--`
-            args.pop();
-            later_args
-        } else {
-            Vec::new()
-        };
-
-        // Now pass the remaining arguments through to `pico_args`.
-        let mut args = Arguments::from_vec(args);
-        let mut bin_args = bin_args.into_iter();
-        let res = Cli {
-            help: args.contains(["-h", "--help"]),
-            version: args.contains(["-v", "--version"]),
-            expand: args.contains(["-x", "--expand"]),
-            path: args
-                .opt_value_from_str(["-f", "--file"])
-                .map_err(|e| e.to_string())?,
-            binary: bin_args.next(),
-            bin_args: bin_args.collect(),
-        };
-
-        // It's up to the caller what to do with the remaining arguments.
-        let remaining = args.finish();
-        if !remaining.is_empty() {
-            return Err(format!("Unknown arguments: {:?}", remaining));
+        let mut parser = Parser::from_env();
+        while let Some(arg) = parser.next()? {
+            match arg {
+                Short('v') | Long("version") => {
+                    println!("{} {}", NAME, VERSION);
+                    process::exit(0);
+                }
+                Short('h') | Long("help") => {
+                    print!("{}", Self::help_doc());
+                    process::exit(0);
+                }
+                Short('x') | Long("expand") => cli.expand = true,
+                Short('f') | Long("file") => {
+                    cli.path = parser.value()?.into_string().ok();
+                }
+                Value(val) => {
+                    if cli.binary == None {
+                        cli.binary = Some(val);
+                    } else {
+                        cli.args.push(val);
+                    }
+                }
+                _ => return Err(arg.unexpected()),
+            }
         }
 
-        Ok(res)
-    }
-
-    pub fn path(&self) -> Result<&str, &str> {
-        let path = self.path.as_ref().ok_or("-f/--file option is required")?;
-
-        Ok(path)
-    }
-
-    pub fn binary(&self) -> Result<&OsString, &str> {
-        self.binary.as_ref().ok_or("<binary> name is required")
+        Ok(cli)
     }
 
     pub fn help_doc() -> String {

@@ -3,14 +3,14 @@
 version = 3
 
 [[package]]
-name = "pico-args"
-version = "0.4.2"
+name = "lexopt"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "db8bcd96cb740d03149cbad5518db9fd87126a10ab519c011893b1754134c468"
+checksum = "de7513aea7d10dc0694d719ac53de3b74f1600e41b9f81ed9f395d8ec36a2a70"
 
 [[package]]
 name = "zenv"
 version = "0.7.1"
 dependencies = [
- "pico-args",
+ "lexopt",
 ]
