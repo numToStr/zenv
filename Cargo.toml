@@ -1,6 +1,6 @@
 [package]
 name = "zenv"
-version = "0.7.1"
+version = "0.8.0"
 description = "Dotenv (.env) loader written in rust"
 authors = ["numToStr <sudo@vikasraj.dev>"]
 edition = "2018"
