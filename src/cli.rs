@@ -5,16 +5,26 @@ use lexopt::{
 };
 use std::{ffi::OsString, process};
 
-#[derive(Default)]
 pub struct Cli {
     // Whether to substitute variables or not
     pub expand: bool,
     // Path to .env file
-    pub path: Option<String>,
+    pub path: String,
     // Name of the command
     pub binary: Option<OsString>,
     // Arguments of the command
     pub args: Vec<OsString>,
+}
+
+impl Default for Cli {
+    fn default() -> Self {
+        Self {
+            expand: false,
+            path: ".env".to_string(),
+            binary: None,
+            args: vec![],
+        }
+    }
 }
 
 impl Cli {
@@ -34,7 +44,7 @@ impl Cli {
                 }
                 Short('x') | Long("expand") => cli.expand = true,
                 Short('f') | Long("file") => {
-                    cli.path = parser.value()?.into_string().ok();
+                    cli.path = parser.value()?.into_string()?;
                 }
                 Value(val) => {
                     if cli.binary == None {
@@ -65,16 +75,16 @@ FLAGS:
     -x, --expand        Enable variable expansion
 
 OPTIONS:
-    -f, --file          Path to .env file
+    -f, --file          Path to env file [default: .env]
 
 ARGS:
     <binary>            Command that needs to be executed
     [args]...           Arguments for the command
 
 Examples:
-    {name} -f .env -- node index.js
-    {name} -f .env -- npm run dev
-    {name} -f .env -- terraform apply
+    {name} -- node index.js
+    {name} -f .env.dev -- npm run dev
+    {name} -f .env.prod -- terraform apply
 ",
             name = NAME,
             ver = VERSION,

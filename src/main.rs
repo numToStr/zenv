@@ -8,10 +8,9 @@ use zenv::Zenv;
 fn bootstrap() -> Result<i32, lexopt::Error> {
     let cli = Cli::parse()?;
 
-    let path = cli.path.ok_or("-f/--file is required")?;
     let bin = cli.binary.ok_or("<binary> name is required")?;
 
-    let vars = Zenv::new(&path, cli.expand)
+    let vars = Zenv::new(&cli.path, cli.expand)
         .parse()
         .map_err(|e| e.to_string())?;
 
