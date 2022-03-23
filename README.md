@@ -107,7 +107,7 @@ NODE_ENV=production
 
 # Single and double quotes are also supported
 S_QUOTE='single_quoted'
-D_QUOTE='double_quoted'
+D_QUOTE="double_quoted"
 ```
 
 ### Comments
