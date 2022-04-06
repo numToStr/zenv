@@ -11,7 +11,7 @@ pub struct Cli {
     // Path to .env file
     pub path: String,
     // Name of the command
-    pub binary: Option<OsString>,
+    pub command: Option<OsString>,
     // Arguments of the command
     pub args: Vec<OsString>,
 }
@@ -21,7 +21,7 @@ impl Default for Cli {
         Self {
             expand: false,
             path: ".env".to_string(),
-            binary: None,
+            command: None,
             args: vec![],
         }
     }
@@ -47,8 +47,8 @@ impl Cli {
                     cli.path = parser.value()?.into_string()?;
                 }
                 Value(val) => {
-                    if cli.binary == None {
-                        cli.binary = Some(val);
+                    if cli.command == None {
+                        cli.command = Some(val);
                     } else {
                         cli.args.push(val);
                     }
@@ -67,7 +67,7 @@ impl Cli {
 {desc}
 
 USAGE:
-    {name} [FLAGS] [OPTIONS] -- <binary> [args]...
+    {name} [FLAGS] [OPTIONS] -- <command> [args]...
 
 FLAGS:
     -v, --version       Prints version
@@ -78,7 +78,7 @@ OPTIONS:
     -f, --file          Path to env file [default: .env]
 
 ARGS:
-    <binary>            Command that needs to be executed
+    <command>           Name of the command to execute
     [args]...           Arguments for the command
 
 Examples:

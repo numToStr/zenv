@@ -8,13 +8,13 @@ use zenv::Zenv;
 fn bootstrap() -> Result<i32, lexopt::Error> {
     let cli = Cli::parse()?;
 
-    let bin = cli.binary.ok_or("<binary> name is required")?;
+    let cmd = cli.command.ok_or("<command> name is required")?;
 
     let vars = Zenv::new(&cli.path, cli.expand)
         .parse()
         .map_err(|e| e.to_string())?;
 
-    let mut program = Command::new(&bin)
+    let mut program = Command::new(&cmd)
         .args(&cli.args)
         .stdin(Stdio::inherit())
         .stdout(Stdio::inherit())

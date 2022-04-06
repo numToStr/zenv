@@ -17,9 +17,9 @@
 
 ## ✨ Features
 
--   Fast as it is written in rust
--   Use as lib/crate or as a standalone cli
--   Support variable expansion
+- Fast as it is written in rust
+- Use as lib/crate or as a standalone cli
+- Support variable expansion
 
 ## 🚀 Installation
 
@@ -34,13 +34,13 @@ zenv = "<version>" # Make sure it's the latest version
 
 ### CLI
 
--   **Using `cargo`**
+- **Using `cargo`**
 
 ```bash
 cargo install zenv --features=cli
 ```
 
--   **Arch Linux**
+- **Arch Linux**
 
 ```bash
 # Using `yay`
@@ -50,7 +50,7 @@ yay -S zenv
 pamac build zenv
 ```
 
--   **From binaries**
+- **From binaries**
 
 Check out the [Release page](https://github.com/numToStr/zenv/releases) for prebuild binaries for `zenv`, available for different operating systems.
 
@@ -77,7 +77,7 @@ zenv
 Dotenv (.env) loader written in rust
 
 USAGE:
-    zenv [FLAGS] [OPTIONS] -- <binary> [args]...
+    zenv [FLAGS] [OPTIONS] -- <command> [args]...
 
 FLAGS:
     -v, --version       Prints version
@@ -88,7 +88,7 @@ OPTIONS:
     -f, --file          Path to .env file
 
 ARGS:
-    <binary>            Command that needs to be executed
+    <command>            Command that needs to be executed
     [args]...           Arguments for the command
 
 Examples:
@@ -146,8 +146,8 @@ ESCAPED="escaped\\nnew\\nline"
 
 `Zenv` also supports variable substitution (off by default) from the current file or from the operating system. Substitution only works if the values is double quoted ie.e `"` and can be achieved by the following:
 
--   Using `${VAR}` pattern (recommended)
--   Starting the variable name by `$` character, which terminates after reaching a character which is not `_` or alphanumeric.
+- Using `${VAR}` pattern (recommended)
+- Starting the variable name by `$` character, which terminates after reaching a character which is not `_` or alphanumeric.
 
 ```bash
 BASIC=basic
@@ -159,6 +159,6 @@ SYSTEM_VARIABLE="${PATH},/this/is/new/path"
 
 ## 🙏 Credits
 
--   [motdotla/dotenv](https://github.com/motdotla/dotenv) (Javascript)
--   [joho/godotenv](https://github.com/joho/godotenv) (Golang)
--   [bkeepers/dotenv](https://github.com/bkeepers/dotenv) (Ruby)
+- [motdotla/dotenv](https://github.com/motdotla/dotenv) (Javascript)
+- [joho/godotenv](https://github.com/joho/godotenv) (Golang)
+- [bkeepers/dotenv](https://github.com/bkeepers/dotenv) (Ruby)
