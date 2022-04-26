@@ -251,6 +251,30 @@ fn spaced_key() {
 }
 
 #[test]
+fn allows_basic_export() {
+    let res = parse("export BASIC=basic").unwrap();
+    assert_eq!(res, ("BASIC", "basic".to_string()))
+}
+
+#[test]
+fn allows_spaced_export() {
+    let res = parse("export     SPACED = spaced").unwrap();
+    assert_eq!(res, ("SPACED", "spaced".to_string()))
+}
+
+#[test]
+fn allows_literal_export() {
+    let res = parse("EXPORT=export").unwrap();
+    assert_eq!(res, ("EXPORT", "export".to_string()))
+}
+
+#[test]
+fn ignore_empty_export() {
+    let res = Line::from("export");
+    assert_eq!(res, Line::Empty);
+}
+
+#[test]
 fn comment_basic() {
     let res = Line::from("# COMMENT=comment");
 

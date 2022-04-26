@@ -142,6 +142,14 @@ If you want to escape the new line character you can use the escape (`\`)
 ESCAPED="escaped\\nnew\\nline"
 ```
 
+### Export and sourcing
+
+You may also add export in front of each line so you can source the file in bash:
+
+```bash
+export BASIC=BASIC
+```
+
 ### Substitution
 
 `Zenv` also supports variable substitution (off by default) from the current file or from the operating system. Substitution only works if the values is double quoted ie.e `"` and can be achieved by the following:
