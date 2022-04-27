@@ -120,7 +120,7 @@ impl<'l> Line<'l> {
 
 impl<'l> From<&'l str> for Line<'l> {
     fn from(line: &'l str) -> Self {
-        if line.is_empty() || line.starts_with(HASH) || line.eq(EXPORT) {
+        if line.is_empty() || line.starts_with(HASH) || line.trim().eq(EXPORT) {
             return Self::Empty;
         };
 

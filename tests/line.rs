@@ -275,6 +275,12 @@ fn ignore_empty_export() {
 }
 
 #[test]
+fn ignore_empty_spaced_export() {
+    let res = Line::from("export ");
+    assert_eq!(res, Line::Empty);
+}
+
+#[test]
 fn comment_basic() {
     let res = Line::from("# COMMENT=comment");
 
