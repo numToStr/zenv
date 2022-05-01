@@ -3,6 +3,8 @@ const HASH: char = '#';
 const B_SLASH: char = '\\';
 const S_QUOTE: char = '\'';
 const D_QUOTE: char = '"';
+const EXPORT: &str = "export";
+const EXPORT_WS: &str = "export ";
 
 /// Type of the quote
 #[derive(Debug, PartialEq)]
@@ -118,7 +120,7 @@ impl<'l> Line<'l> {
 
 impl<'l> From<&'l str> for Line<'l> {
     fn from(line: &'l str) -> Self {
-        if line.is_empty() || line.starts_with(HASH) {
+        if line.is_empty() || line.starts_with(HASH) || line.trim().eq(EXPORT) {
             return Self::Empty;
         };
 
@@ -126,7 +128,7 @@ impl<'l> From<&'l str> for Line<'l> {
 
         match (parts.next(), parts.next()) {
             (Some(k), Some(v)) => {
-                let key = k.trim();
+                let key = k.strip_prefix(EXPORT_WS).unwrap_or(k).trim();
                 let mut chars = v.chars();
 
                 let first = chars.next();

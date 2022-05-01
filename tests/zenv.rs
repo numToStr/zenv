@@ -6,6 +6,7 @@ fn zenv_basic() {
 
     assert_eq!(z.get("BASIC").unwrap(), "basic");
     assert_eq!(z.get("EMPTY").unwrap(), "");
+    assert_eq!(z.get("EXPORTED").unwrap(), "exported");
     assert_eq!(z.get("SINGLE_QUOTES").unwrap(), "single_quotes");
     assert_eq!(z.get("DOUBLE_QUOTES").unwrap(), "double_quotes");
 }
@@ -24,6 +25,7 @@ fn zenv_expanded() {
         z.get("DOUBLE_EXPANDED_NEW").unwrap(),
         "basic_basic-basic-expanded"
     );
+    assert_eq!(z.get("EXPORTED").unwrap(), "basic_exported");
 
     assert_eq!(z.get("NO_EXPANDED").unwrap(), "$BASIC-expanded");
     assert_eq!(z.get("NO_DOUBLE_EXPANDED").unwrap(), "$BASIC-$EXPANDED");
@@ -46,6 +48,7 @@ fn zenv_macro_basic() {
 
     assert_eq!(var_os("BASIC").unwrap(), "basic");
     assert_eq!(var_os("EMPTY").unwrap(), "");
+    assert_eq!(var_os("EXPORTED").unwrap(), "exported");
     assert_eq!(var_os("SINGLE_QUOTES").unwrap(), "single_quotes");
     assert_eq!(var_os("DOUBLE_QUOTES").unwrap(), "double_quotes");
 }
